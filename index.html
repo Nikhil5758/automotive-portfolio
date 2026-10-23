@@ -1,0 +1,3866 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nikhil Chourasiya | High-Performance Java Backend & Full-Stack Architect</title>
+    <meta name="description" content="Hyper-premium supercar telemetry & automotive developer portfolio for Nikhil Chourasiya, High-Performance Java Backend & Full-Stack Architect." />
+    <meta property="og:title" content="Nikhil Chourasiya | High-Performance Java Backend & Full-Stack Architect" />
+    <meta property="og:description" content="Hyper-premium supercar telemetry & automotive developer portfolio for Nikhil Chourasiya, High-Performance Java Backend & Full-Stack Architect." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts for Hypercar Telemetry & Cockpit Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,600;1,700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Rajdhani:wght@500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+      :root {
+        --bg-carbon: #08090b;
+        --bg-cockpit: #0c0e12;
+        --bg-surface: #12151b;
+        --bg-elevated: #181d24;
+        --bg-glass: rgba(18, 21, 27, 0.82);
+        --border-subtle: rgba(255, 255, 255, 0.08);
+        --border-metallic: rgba(255, 255, 255, 0.16);
+        --redline: #ff1e42;
+        --redline-glow: rgba(255, 30, 66, 0.45);
+        --nitrous-cyan: #00f0ff;
+        --nitrous-glow: rgba(0, 240, 255, 0.38);
+        --amber-warning: #ffb703;
+        --amber-glow: rgba(255, 183, 3, 0.35);
+        --telemetry-green: #00ff88;
+        --telemetry-glow: rgba(0, 255, 136, 0.35);
+        --text-pure: #f8f9fa;
+        --text-secondary: #9aa2b1;
+        --text-muted: #5d6778;
+        --font-display: 'Chakra Petch', 'Syne', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+        --font-hud: 'Rajdhani', sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        background-color: var(--bg-carbon);
+        color: var(--text-pure);
+        font-family: var(--font-hud), sans-serif;
+        overflow-x: hidden;
+      }
+
+      body {
+        min-height: 100vh;
+        background-color: var(--bg-carbon);
+        background-image:
+          radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.05) 0%, transparent 60%),
+          radial-gradient(circle at 10% 40%, rgba(255, 30, 66, 0.04) 0%, transparent 50%),
+          radial-gradient(circle at 90% 70%, rgba(0, 240, 255, 0.04) 0%, transparent 50%),
+          linear-gradient(27deg, #111317 5px, transparent 5px) 0 5px,
+          linear-gradient(207deg, #111317 5px, transparent 5px) 10px 0px,
+          linear-gradient(27deg, #16181f 5px, transparent 5px) 0px 10px,
+          linear-gradient(207deg, #16181f 5px, transparent 5px) 10px 5px,
+          linear-gradient(90deg, #08090b 10px, transparent 10px),
+          linear-gradient(#0b0c10 25%, #08090b 25%, #08090b 50%, transparent 50%, transparent 75%, #0f1015 75%, #0f1015);
+        background-size: 100% 100%, 100% 100%, 100% 100%, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 20px 20px;
+        background-attachment: fixed;
+        line-height: 1.5;
+        overflow-x: hidden;
+      }
+
+      /* Custom High-Octane Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #08090b;
+        border-left: 1px solid var(--border-subtle);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #242933;
+        border-radius: 2px;
+        border: 1px solid rgba(255, 30, 66, 0.4);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--redline);
+        box-shadow: 0 0 10px var(--redline);
+      }
+
+      /* Selection */
+      ::selection {
+        background: var(--redline);
+        color: #fff;
+      }
+
+      /* Carbon & HUD Utilities */
+      .font-display { font-family: var(--font-display); }
+      .font-mono { font-family: var(--font-mono); }
+      .font-hud { font-family: var(--font-hud); }
+
+      .carbon-border {
+        border: 1px solid var(--border-subtle);
+        position: relative;
+      }
+      .carbon-border::before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: -1px;
+        width: 8px;
+        height: 8px;
+        border-top: 2px solid var(--redline);
+        border-left: 2px solid var(--redline);
+        pointer-events: none;
+      }
+      .carbon-border::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        right: -1px;
+        width: 8px;
+        height: 8px;
+        border-bottom: 2px solid var(--nitrous-cyan);
+        border-right: 2px solid var(--nitrous-cyan);
+        pointer-events: none;
+      }
+
+      .hud-glass {
+        background: var(--bg-glass);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--border-subtle);
+      }
+
+      .redline-glow {
+        box-shadow: 0 0 25px var(--redline-glow);
+      }
+      .nitrous-glow {
+        box-shadow: 0 0 25px var(--nitrous-glow);
+      }
+
+      /* Pit Speed Striping */
+      .hazard-stripe {
+        background: repeating-linear-gradient(
+          -45deg,
+          #161920,
+          #161920 10px,
+          #0e1014 10px,
+          #0e1014 20px
+        );
+      }
+
+      /* Container */
+      .paddock-container {
+        max-width: 1380px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      /* Header HUD Navigation */
+      header.hud-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(8, 9, 11, 0.88);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      }
+
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 68px;
+      }
+
+      .brand-box {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+      }
+
+      .tach-logo-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 4px;
+        background: linear-gradient(135deg, #1c2029 0%, #0d0f13 100%);
+        border: 1px solid rgba(255, 30, 66, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 0 12px rgba(255, 30, 66, 0.3);
+      }
+
+      .tach-logo-mark svg {
+        width: 22px;
+        height: 22px;
+        color: var(--redline);
+      }
+
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .brand-title {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 1.05rem;
+        letter-spacing: 0.08em;
+        color: var(--text-pure);
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .brand-telemetry {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.15em;
+        color: var(--nitrous-cyan);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        list-style: none;
+      }
+
+      .nav-link-btn {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        letter-spacing: 0.06em;
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 0.45rem 0.85rem;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+        position: relative;
+        border: 1px solid transparent;
+      }
+
+      .nav-link-btn:hover {
+        color: var(--text-pure);
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(0, 240, 255, 0.3);
+      }
+
+      .nav-link-btn.active {
+        color: var(--nitrous-cyan);
+        background: rgba(0, 240, 255, 0.08);
+        border-color: rgba(0, 240, 255, 0.5);
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.85rem;
+        background: rgba(0, 255, 136, 0.06);
+        border: 1px solid rgba(0, 255, 136, 0.35);
+        border-radius: 9999px;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        color: var(--telemetry-green);
+        text-transform: uppercase;
+      }
+
+      .pulse-beacon {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--telemetry-green);
+        box-shadow: 0 0 10px var(--telemetry-green);
+        animation: pulseAnimation 1.6s infinite ease-in-out;
+      }
+
+      @keyframes pulseAnimation {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        50% { transform: scale(1.3); opacity: 1; }
+        100% { transform: scale(0.9); opacity: 0.7; }
+      }
+
+      .audio-toggle-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-subtle);
+        color: var(--text-secondary);
+        width: 36px;
+        height: 36px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .audio-toggle-btn:hover {
+        border-color: var(--nitrous-cyan);
+        color: var(--nitrous-cyan);
+      }
+      .audio-toggle-btn.active {
+        background: rgba(0, 240, 255, 0.12);
+        border-color: var(--nitrous-cyan);
+        color: var(--nitrous-cyan);
+      }
+
+      /* Mobile Nav Toggle */
+      .mobile-menu-toggle {
+        display: none;
+        background: transparent;
+        border: 1px solid var(--border-subtle);
+        color: var(--text-pure);
+        padding: 0.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      /* Buttons & Controls */
+      .btn-launch {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        background: linear-gradient(135deg, #ff1e42 0%, #b80d28 100%);
+        color: #fff;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 0.85rem 1.75rem;
+        border: 1px solid #ff4d6a;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0 4px 20px rgba(255, 30, 66, 0.4);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+      }
+      .btn-launch::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+        transition: left 0.5s ease;
+      }
+      .btn-launch:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(255, 30, 66, 0.6);
+        border-color: #fff;
+      }
+      .btn-launch:hover::after {
+        left: 100%;
+      }
+
+      .btn-paddock {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        background: rgba(25, 29, 38, 0.85);
+        color: var(--text-pure);
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 0.85rem 1.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.25s ease;
+      }
+      .btn-paddock:hover {
+        background: rgba(35, 41, 54, 1);
+        border-color: var(--nitrous-cyan);
+        color: var(--nitrous-cyan);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 240, 255, 0.2);
+      }
+
+      /* Hero Section */
+      section.hero-viewport {
+        padding-top: 96px;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 1.25fr;
+        gap: 2.5rem;
+        align-items: center;
+        width: 100%;
+        padding: 2rem 0 3rem 0;
+      }
+
+      .hero-meta-kicker {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        letter-spacing: 0.18em;
+        color: var(--nitrous-cyan);
+        text-transform: uppercase;
+        margin-bottom: 0.85rem;
+      }
+
+      .hero-title {
+        font-family: var(--font-display);
+        font-size: clamp(2.4rem, 5.2vw, 4.4rem);
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        line-height: 1.04;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(180deg, #ffffff 0%, #d4d9e2 70%, #9aa2b1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      }
+
+      .hero-subtitle {
+        font-family: var(--font-display);
+        font-size: clamp(1.1rem, 2.1vw, 1.45rem);
+        font-weight: 600;
+        color: var(--redline);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .hero-desc {
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+        line-height: 1.65;
+        margin-bottom: 2rem;
+        max-width: 580px;
+      }
+
+      .hero-btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+      }
+
+      /* Quick Telemetry Readouts */
+      .telemetry-strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        background: rgba(14, 17, 23, 0.75);
+        border: 1px solid var(--border-subtle);
+        padding: 1rem 1.2rem;
+        border-radius: 4px;
+        position: relative;
+      }
+      .telemetry-strip::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--redline), var(--nitrous-cyan));
+      }
+
+      .telemetry-item {
+        display: flex;
+        flex-direction: column;
+      }
+      .telemetry-label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+      }
+      .telemetry-val {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: var(--text-pure);
+        letter-spacing: 0.04em;
+      }
+      .telemetry-sub {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--nitrous-cyan);
+        letter-spacing: 0.05em;
+      }
+
+      /* 3D Viewport Box */
+      .three-viewport-wrap {
+        position: relative;
+        width: 100%;
+        height: 520px;
+        background: radial-gradient(circle at 50% 50%, #161a22 0%, #0a0b0f 80%);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), inset 0 0 60px rgba(0, 240, 255, 0.05);
+      }
+
+      #webgl-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        cursor: grab;
+      }
+      #webgl-canvas:active {
+        cursor: grabbing;
+      }
+
+      /* HUD Overlays on 3D Canvas */
+      .hud-overlay-top {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        right: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        pointer-events: none;
+      }
+
+      .hud-badge-tag {
+        background: rgba(9, 11, 15, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 0.35rem 0.65rem;
+        border-radius: 3px;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+        color: var(--nitrous-cyan);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        pointer-events: auto;
+      }
+
+      /* Live Shift Light Cluster */
+      .shift-light-bar {
+        display: flex;
+        gap: 4px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 5px 8px;
+        border-radius: 3px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        pointer-events: auto;
+      }
+      .shift-led {
+        width: 9px;
+        height: 9px;
+        border-radius: 2px;
+        background: #20242e;
+        transition: background 0.08s, box-shadow 0.08s;
+      }
+      .shift-led.green.lit {
+        background: #00ff88;
+        box-shadow: 0 0 8px #00ff88;
+      }
+      .shift-led.amber.lit {
+        background: #ffb703;
+        box-shadow: 0 0 8px #ffb703;
+      }
+      .shift-led.red.lit {
+        background: #ff1e42;
+        box-shadow: 0 0 10px #ff1e42;
+      }
+      .shift-led.flashing {
+        animation: shiftFlash 0.12s infinite alternate;
+      }
+      @keyframes shiftFlash {
+        from { opacity: 0.3; }
+        to { opacity: 1; filter: brightness(1.6); }
+      }
+
+      /* Tachometer Dial HUD */
+      .hud-overlay-bottom {
+        position: absolute;
+        bottom: 1rem;
+        left: 1rem;
+        right: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        pointer-events: none;
+      }
+
+      .tach-dial-box {
+        background: rgba(10, 12, 16, 0.88);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        pointer-events: auto;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      }
+
+      .tach-radial {
+        position: relative;
+        width: 84px;
+        height: 84px;
+      }
+      .tach-svg {
+        transform: rotate(-90deg);
+        width: 100%;
+        height: 100%;
+      }
+      .tach-circle-bg {
+        fill: none;
+        stroke: #1c222e;
+        stroke-width: 6;
+      }
+      .tach-circle-progress {
+        fill: none;
+        stroke: var(--nitrous-cyan);
+        stroke-width: 6;
+        stroke-dasharray: 220;
+        stroke-dashoffset: 220;
+        transition: stroke-dashoffset 0.15s ease, stroke 0.15s ease;
+      }
+
+      .tach-radial-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .gear-number {
+        font-family: var(--font-display);
+        font-size: 1.8rem;
+        font-weight: 800;
+        line-height: 1;
+        color: #fff;
+      }
+      .gear-label {
+        font-family: var(--font-mono);
+        font-size: 0.55rem;
+        color: var(--text-muted);
+        letter-spacing: 0.1em;
+      }
+
+      /* Engine Temp SVG Radial Gauge */
+      .temp-radial {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        flex-shrink: 0;
+      }
+      .temp-svg {
+        transform: rotate(-90deg);
+        width: 100%;
+        height: 100%;
+      }
+      .temp-circle-bg {
+        fill: none;
+        stroke: #1c222e;
+        stroke-width: 5.5;
+      }
+      .temp-circle-progress {
+        fill: none;
+        stroke: var(--nitrous-cyan);
+        stroke-width: 5.5;
+        stroke-linecap: round;
+        stroke-dasharray: 201.06;
+        stroke-dashoffset: 130;
+        transition: stroke-dashoffset 0.08s ease, stroke 0.2s ease, filter 0.2s ease;
+      }
+      .temp-radial-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .temp-val-row {
+        display: flex;
+        align-items: baseline;
+        line-height: 1;
+      }
+      .temp-digits {
+        font-family: var(--font-mono);
+        font-size: 1.22rem;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 0.02em;
+      }
+      .temp-unit {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        color: var(--nitrous-cyan);
+        font-weight: 700;
+        margin-left: 1px;
+      }
+      .temp-label {
+        font-family: var(--font-mono);
+        font-size: 0.52rem;
+        color: var(--text-muted);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-top: 1px;
+      }
+      .temp-status-badge {
+        font-family: var(--font-mono);
+        font-size: 0.5rem;
+        letter-spacing: 0.06em;
+        padding: 0.08rem 0.35rem;
+        border-radius: 2px;
+        margin-top: 2px;
+        text-transform: uppercase;
+        font-weight: 700;
+        transition: all 0.2s ease;
+      }
+
+      .tach-readouts {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+      .tach-rpm-row {
+        display: flex;
+        align-items: baseline;
+        gap: 0.35rem;
+      }
+      .tach-rpm-digits {
+        font-family: var(--font-mono);
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: var(--text-pure);
+        letter-spacing: 0.05em;
+      }
+      .tach-rpm-unit {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--redline);
+        font-weight: 600;
+      }
+      .tach-speed-kph {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        color: var(--nitrous-cyan);
+      }
+
+      /* Viewport Interactive Controls Bar */
+      .viewport-ctrls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        pointer-events: auto;
+      }
+      .ctrl-btn {
+        background: rgba(18, 22, 29, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: var(--text-pure);
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        font-weight: 600;
+        padding: 0.45rem 0.85rem;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s ease;
+      }
+      .ctrl-btn:hover {
+        background: rgba(30, 36, 48, 1);
+        border-color: var(--nitrous-cyan);
+        color: var(--nitrous-cyan);
+      }
+      .ctrl-btn.active {
+        background: rgba(255, 30, 66, 0.2);
+        border-color: var(--redline);
+        color: #fff;
+        box-shadow: 0 0 12px rgba(255, 30, 66, 0.4);
+      }
+      .ctrl-btn.revving {
+        animation: revBtnPulse 0.1s infinite alternate;
+      }
+      @keyframes revBtnPulse {
+        from { transform: scale(0.97); }
+        to { transform: scale(1.03); }
+      }
+
+      /* Section Common Styling */
+      section.paddock-section {
+        padding: 6.5rem 0;
+        position: relative;
+      }
+      section.paddock-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 5%;
+        right: 5%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+      }
+
+      .section-header {
+        margin-bottom: 3.5rem;
+        text-align: left;
+      }
+      .section-kicker {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.2em;
+        color: var(--redline);
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .section-kicker::before {
+        content: '';
+        display: inline-block;
+        width: 14px;
+        height: 2px;
+        background: var(--redline);
+      }
+      .section-title {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 3.8vw, 3rem);
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-pure);
+        line-height: 1.1;
+      }
+      .section-desc {
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+        max-width: 650px;
+        margin-top: 0.75rem;
+      }
+
+      /* Dyno Sheet Power Curve Interactive Display */
+      .dyno-bench {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        padding: 1.75rem;
+        margin-bottom: 3rem;
+        position: relative;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+      }
+      .dyno-bench-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .dyno-metric-badges {
+        display: flex;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+      }
+      .dyno-metric-node {
+        display: flex;
+        flex-direction: column;
+      }
+      .dyno-metric-label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+      .dyno-metric-val {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-pure);
+      }
+
+      .dyno-canvas-container {
+        position: relative;
+        width: 100%;
+        height: 240px;
+        background: #0a0c10;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      #dyno-chart-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .dyno-hover-tooltip {
+        position: absolute;
+        display: none;
+        background: rgba(14, 18, 24, 0.95);
+        border: 1px solid var(--nitrous-cyan);
+        padding: 0.4rem 0.75rem;
+        border-radius: 3px;
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        color: #fff;
+        pointer-events: none;
+        z-index: 10;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      }
+
+      /* Powertrain Filter Tabs */
+      .powertrain-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+      }
+      .tab-btn {
+        background: rgba(18, 22, 29, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-secondary);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.55rem 1.1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .tab-btn:hover {
+        color: var(--text-pure);
+        border-color: rgba(255, 255, 255, 0.25);
+      }
+      .tab-btn.active {
+        background: linear-gradient(135deg, rgba(255, 30, 66, 0.18) 0%, rgba(255, 30, 66, 0.05) 100%);
+        border-color: var(--redline);
+        color: #fff;
+        box-shadow: 0 0 15px rgba(255, 30, 66, 0.25);
+      }
+
+      /* Powertrain Grid */
+      .powertrain-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .engine-spec-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        padding: 1.75rem;
+        transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .engine-spec-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(0, 240, 255, 0.4);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 240, 255, 0.1);
+      }
+
+      .spec-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.25rem;
+      }
+      .spec-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--nitrous-cyan);
+      }
+      .spec-icon-box svg {
+        width: 24px;
+        height: 24px;
+      }
+      .spec-category-badge {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        color: var(--redline);
+        text-transform: uppercase;
+      }
+
+      .spec-card-title {
+        font-family: var(--font-display);
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-pure);
+        margin-bottom: 0.4rem;
+        letter-spacing: 0.02em;
+      }
+      .spec-card-sub {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-bottom: 1.25rem;
+      }
+
+      .telemetry-tag-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin-bottom: 1.4rem;
+      }
+      .telemetry-chip {
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.3rem 0.65rem;
+        border-radius: 3px;
+        color: #d1d7e2;
+        transition: all 0.2s;
+      }
+      .telemetry-chip:hover {
+        background: rgba(0, 240, 255, 0.1);
+        border-color: var(--nitrous-cyan);
+        color: #fff;
+      }
+
+      .spec-output-bar {
+        background: #0b0d11;
+        border-radius: 2px;
+        height: 6px;
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+      }
+      .spec-output-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--nitrous-cyan), var(--redline));
+        border-radius: 2px;
+      }
+      .spec-output-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.45rem;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--text-muted);
+      }
+
+      /* Featured Track Projects (Dyno Runs) */
+      .projects-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .project-chassis-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+        position: relative;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      .project-chassis-card:hover {
+        border-color: rgba(255, 30, 66, 0.4);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 30, 66, 0.12);
+      }
+
+      .card-telemetry-header {
+        background: #0e1117;
+        padding: 1rem 1.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+      .card-machine-id {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.16em;
+        color: var(--redline);
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .card-status-indicator {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--telemetry-green);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .project-card-body {
+        padding: 2rem 1.75rem;
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 2.25rem;
+        align-items: center;
+      }
+
+      .project-info-side {
+        display: flex;
+        flex-direction: column;
+      }
+      .project-name {
+        font-family: var(--font-display);
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 0.03em;
+        margin-bottom: 0.6rem;
+      }
+      .project-stack-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 1.25rem;
+      }
+      .stack-pill {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        background: rgba(0, 240, 255, 0.06);
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        color: var(--nitrous-cyan);
+        padding: 0.25rem 0.6rem;
+        border-radius: 2px;
+      }
+
+      .project-spec-desc {
+        color: var(--text-secondary);
+        font-size: 0.98rem;
+        line-height: 1.65;
+        margin-bottom: 1.5rem;
+      }
+
+      .project-specs-list {
+        list-style: none;
+        margin-bottom: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+      .project-specs-list li {
+        font-size: 0.92rem;
+        color: #c5cbd6;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+      }
+      .project-specs-list li svg {
+        width: 16px;
+        height: 16px;
+        color: var(--redline);
+        flex-shrink: 0;
+        margin-top: 3px;
+      }
+
+      .project-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      /* Interactive Live Simulation inside cards */
+      .project-interactive-preview {
+        background: #090b0e;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        padding: 1.25rem;
+        position: relative;
+        box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+      }
+      .preview-terminal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.85rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .preview-terminal-title {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      /* Mini Financial Chart Preview */
+      .mini-chart-wrap {
+        height: 180px;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        padding-top: 20px;
+      }
+      .chart-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        height: 100%;
+        justify-content: flex-end;
+      }
+      .chart-bar-income {
+        width: 100%;
+        background: linear-gradient(180deg, var(--telemetry-green) 0%, rgba(0, 255, 136, 0.3) 100%);
+        border-radius: 2px 2px 0 0;
+        transition: height 0.4s ease;
+      }
+      .chart-bar-expense {
+        width: 100%;
+        background: linear-gradient(180deg, var(--redline) 0%, rgba(255, 30, 66, 0.3) 100%);
+        border-radius: 2px 2px 0 0;
+        transition: height 0.4s ease;
+      }
+      .chart-col-label {
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        color: var(--text-muted);
+      }
+
+      /* Code Audit Terminal Sandbox */
+      .code-audit-terminal {
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        color: #d1d7e2;
+        background: #060709;
+        border: 1px solid rgba(0, 240, 255, 0.15);
+        border-radius: 4px;
+        padding: 0.85rem;
+        max-height: 220px;
+        overflow-y: auto;
+      }
+      .code-line-dim { color: #535d6e; }
+      .code-line-keyword { color: #ff1e42; font-weight: 600; }
+      .code-line-class { color: #00f0ff; }
+      .code-line-comment { color: #00ff88; font-style: italic; }
+
+      .audit-trigger-btn {
+        margin-top: 0.85rem;
+        width: 100%;
+        background: rgba(0, 240, 255, 0.12);
+        border: 1px solid var(--nitrous-cyan);
+        color: var(--nitrous-cyan);
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.55rem;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        transition: all 0.2s ease;
+      }
+      .audit-trigger-btn:hover {
+        background: var(--nitrous-cyan);
+        color: #000;
+        box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+      }
+
+      /* Track Log (Experience Timeline) */
+      .circuit-timeline {
+        position: relative;
+        padding-left: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+      }
+      .circuit-timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 11px;
+        width: 2px;
+        background: repeating-linear-gradient(
+          to bottom,
+          var(--redline) 0px,
+          var(--redline) 14px,
+          transparent 14px,
+          transparent 22px
+        );
+      }
+
+      .timeline-node {
+        position: relative;
+      }
+      .timeline-checkpoint {
+        position: absolute;
+        left: -2.5rem;
+        top: 4px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #0e1117;
+        border: 2px solid var(--redline);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 12px var(--redline-glow);
+      }
+      .checkpoint-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--nitrous-cyan);
+      }
+
+      .timeline-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      }
+      .timeline-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      .timeline-role {
+        font-family: var(--font-display);
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: #fff;
+      }
+      .timeline-org {
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+        color: var(--nitrous-cyan);
+        letter-spacing: 0.05em;
+      }
+      .timeline-dates {
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        color: var(--amber-warning);
+        background: rgba(255, 183, 3, 0.08);
+        border: 1px solid rgba(255, 183, 3, 0.25);
+        padding: 0.25rem 0.65rem;
+        border-radius: 2px;
+        letter-spacing: 0.06em;
+      }
+
+      .sectors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+      .sector-box {
+        background: #0b0d12;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-left: 3px solid var(--redline);
+        padding: 1rem;
+        border-radius: 0 4px 4px 0;
+      }
+      .sector-num {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--redline);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-bottom: 0.35rem;
+      }
+      .sector-desc {
+        font-size: 0.88rem;
+        color: #c9cfdc;
+        line-height: 1.5;
+      }
+
+      /* Qualifications & Badges */
+      .qual-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+      }
+
+      .paddock-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        padding: 2rem;
+        position: relative;
+      }
+      .paddock-card-title {
+        font-family: var(--font-display);
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 0.75rem;
+      }
+      .paddock-card-title svg {
+        color: var(--redline);
+        width: 22px;
+        height: 22px;
+      }
+
+      .academy-item {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .academy-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+      .academy-institution {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #fff;
+      }
+      .academy-degree {
+        font-size: 0.92rem;
+        color: var(--nitrous-cyan);
+        margin: 0.2rem 0;
+      }
+      .academy-meta {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.85rem;
+      }
+      .academy-cgpa {
+        color: var(--telemetry-green);
+        font-weight: 600;
+      }
+
+      .tuning-badges-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .tuning-badge-row {
+        background: #0c0e14;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.9rem 1.1rem;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: border-color 0.2s, background 0.2s;
+      }
+      .tuning-badge-row:hover {
+        border-color: var(--nitrous-cyan);
+        background: rgba(0, 240, 255, 0.04);
+      }
+      .badge-info {
+        display: flex;
+        flex-direction: column;
+      }
+      .badge-name {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+      }
+      .badge-issuer {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+      .badge-stamp {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--telemetry-green);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        padding: 0.2rem 0.5rem;
+        border-radius: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      /* Pit Stop (Contact Terminal) */
+      .pitstop-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 2.5rem;
+      }
+
+      .terminal-form-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        padding: 2.25rem;
+        position: relative;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+      }
+
+      .form-group {
+        margin-bottom: 1.4rem;
+        display: flex;
+        flex-direction: column;
+      }
+      .form-label {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        color: var(--nitrous-cyan);
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
+      }
+      .form-input, .form-textarea {
+        background: #090b0e;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-family: var(--font-mono);
+        font-size: 0.88rem;
+        padding: 0.8rem 1rem;
+        border-radius: 4px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .form-input:focus, .form-textarea:focus {
+        border-color: var(--redline);
+        box-shadow: 0 0 12px var(--redline-glow);
+      }
+
+      .terminal-output-box {
+        margin-top: 1.25rem;
+        background: #06070a;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.75rem 1rem;
+        border-radius: 3px;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--telemetry-green);
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+      }
+
+      .comms-info-card {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .comms-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        padding: 1.75rem;
+        transition: border-color 0.25s, transform 0.25s;
+      }
+      .comms-card:hover {
+        border-color: var(--nitrous-cyan);
+        transform: translateY(-2px);
+      }
+      .comms-card-label {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 0.35rem;
+      }
+      .comms-card-val {
+        font-family: var(--font-mono);
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #fff;
+        word-break: break-all;
+        margin-bottom: 0.75rem;
+      }
+      .copy-action-btn {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: var(--text-secondary);
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 3px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: all 0.2s;
+      }
+      .copy-action-btn:hover {
+        border-color: var(--nitrous-cyan);
+        color: var(--nitrous-cyan);
+        background: rgba(0, 240, 255, 0.08);
+      }
+
+      /* Driver Social Grid */
+      .driver-links-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      .driver-link-item {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        padding: 1.25rem;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        transition: all 0.2s;
+      }
+      .driver-link-item:hover {
+        border-color: var(--redline);
+        background: rgba(255, 30, 66, 0.08);
+        transform: translateY(-2px);
+      }
+      .driver-link-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--nitrous-cyan);
+      }
+      .driver-link-text {
+        display: flex;
+        flex-direction: column;
+      }
+      .driver-link-title {
+        font-family: var(--font-display);
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+      .driver-link-handle {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+
+      /* Footer */
+      footer.hud-footer {
+        background: #050608;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 2.5rem 0;
+        margin-top: 5rem;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+      }
+      .footer-left {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+      .footer-brand {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: 0.08em;
+      }
+      .footer-coords {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--text-muted);
+      }
+      .paddock-clock {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--nitrous-cyan);
+        background: rgba(0, 240, 255, 0.06);
+        border: 1px solid rgba(0, 240, 255, 0.2);
+        padding: 0.35rem 0.85rem;
+        border-radius: 4px;
+      }
+
+      /* Toast Notification */
+      #telemetry-toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #0e1219;
+        border: 1px solid var(--telemetry-green);
+        color: #fff;
+        padding: 0.75rem 1.25rem;
+        border-radius: 4px;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.8), 0 0 20px var(--telemetry-glow);
+        transform: translateY(120px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      #telemetry-toast.visible {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      /* Responsive Breakpoints */
+      @media (max-width: 1024px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+        .three-viewport-wrap {
+          height: 460px;
+        }
+        .project-card-body {
+          grid-template-columns: 1fr;
+        }
+        .qual-grid, .pitstop-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+        .mobile-menu-toggle {
+          display: block;
+        }
+        .mobile-drawer {
+          position: fixed;
+          top: 68px;
+          left: 0;
+          right: 0;
+          background: #0a0c10;
+          border-bottom: 1px solid var(--border-subtle);
+          padding: 1.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          transform: translateY(-150%);
+          transition: transform 0.3s ease;
+          z-index: 999;
+        }
+        .mobile-drawer.open {
+          transform: translateY(0);
+        }
+        .mobile-drawer a {
+          color: #fff;
+          text-decoration: none;
+          font-family: var(--font-mono);
+          font-size: 0.95rem;
+          padding: 0.5rem 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .three-viewport-wrap {
+          height: 380px;
+        }
+        .hud-overlay-bottom {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0.75rem;
+        }
+        .tach-dial-box {
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 0.65rem;
+        }
+        .tach-radial, .temp-radial {
+          width: 74px;
+          height: 74px;
+        }
+        .telemetry-strip {
+          grid-template-columns: 1fr;
+        }
+        .powertrain-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HUD Navigation Bar -->
+    <header class="hud-nav">
+      <div class="paddock-container">
+        <div class="nav-inner">
+          <a href="#hero" class="brand-box">
+            <div class="tach-logo-mark">
+              <!-- Tachometer gauge icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v2"></path>
+                <path d="m4.93 4.93 1.41 1.41"></path>
+                <path d="M20 12h2"></path>
+                <path d="m19.07 4.93-1.41 1.41"></path>
+                <path d="M15.93 15.93 12 12"></path>
+                <circle cx="12" cy="12" r="8"></circle>
+              </svg>
+            </div>
+            <div class="brand-text">
+              <span class="brand-title">NIKHIL CHOURASIYA</span>
+              <span class="brand-telemetry">0-100 TECH SPECS // PADDOCK</span>
+            </div>
+          </a>
+
+          <ul class="nav-links">
+            <li><a href="#hero" class="nav-link-btn active">[01 // Telemetry]</a></li>
+            <li><a href="#powertrain" class="nav-link-btn">[02 // Powertrain]</a></li>
+            <li><a href="#dyno-runs" class="nav-link-btn">[03 // Dyno Runs]</a></li>
+            <li><a href="#track-log" class="nav-link-btn">[04 // Track Log]</a></li>
+            <li><a href="#pit-stop" class="nav-link-btn">[05 // Pit Stop]</a></li>
+          </ul>
+
+          <div class="nav-actions">
+            <div class="status-pill" title="Current Engineering Telemetry Status">
+              <span class="pulse-beacon"></span>
+              <span>ENGINE: OPTIMIZED • OPEN FOR BACKEND ROLES</span>
+            </div>
+
+            <button id="audio-toggle" class="audio-toggle-btn" title="Toggle V8 Audio Simulation">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              </svg>
+            </button>
+
+            <button id="mobile-toggle" class="mobile-menu-toggle" aria-label="Toggle Menu">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Dropdown -->
+      <div id="mobile-drawer" class="mobile-drawer">
+        <a href="#hero" onclick="closeMobileMenu()">[01 // Telemetry]</a>
+        <a href="#powertrain" onclick="closeMobileMenu()">[02 // Powertrain]</a>
+        <a href="#dyno-runs" onclick="closeMobileMenu()">[03 // Dyno Runs]</a>
+        <a href="#track-log" onclick="closeMobileMenu()">[04 // Track Log]</a>
+        <a href="#pit-stop" onclick="closeMobileMenu()">[05 // Pit Stop]</a>
+      </div>
+    </header>
+
+    <!-- Hero Section (The Launch Pad) -->
+    <section id="hero" class="hero-viewport paddock-section">
+      <div class="paddock-container">
+        <div class="hero-grid">
+          <!-- Left Column: Specs, Bio & Launch Controls -->
+          <div class="hero-content-col">
+            <div class="hero-meta-kicker">
+              <span>PADDOCK // BENGALURU, KARNATAKA, INDIA</span>
+              <span>•</span>
+              <span style="color: var(--telemetry-green);">STATUS: RACE-READY</span>
+            </div>
+
+            <h1 class="hero-title">NIKHIL CHOURASIYA</h1>
+            <div class="hero-subtitle">
+              <span>// High-Performance Java Backend & Full-Stack Architect</span>
+            </div>
+
+            <p class="hero-desc">
+              Specialized in high-throughput backend architecture, multi-tier database engines, and writing low-latency, modular systems. Engineering resilient Java backends, scalable ORM data layers, and clean full-stack telemetry dashboards.
+            </p>
+
+            <div class="hero-btn-row">
+              <a href="#dyno-runs" id="engage-launch-btn" class="btn-launch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                [ENGAGE LAUNCH CONTROL]
+              </a>
+              <a href="#pit-stop" class="btn-paddock">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                [PIT CREW COMMS]
+              </a>
+            </div>
+
+            <!-- Quick Telemetry Readouts -->
+            <div class="telemetry-strip carbon-border">
+              <div class="telemetry-item">
+                <span class="telemetry-label">0-100 Speed</span>
+                <span class="telemetry-val">150+ Solved</span>
+                <span class="telemetry-sub">Algorithmic Problems</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Engine Efficiency</span>
+                <span class="telemetry-val">7.50 / 10</span>
+                <span class="telemetry-sub">B.Tech CGPA</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Core Architecture</span>
+                <span class="telemetry-val">Multi-Tier</span>
+                <span class="telemetry-sub">Java / ORM / Relational DBs</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live WebGL 3D Supercar Viewport -->
+          <div class="hero-3d-col">
+            <div class="three-viewport-wrap carbon-border" id="viewport-container">
+              <canvas id="webgl-canvas"></canvas>
+
+              <!-- HUD Top Overlay: Shift Lights & Telemetry Header -->
+              <div class="hud-overlay-top">
+                <div class="hud-badge-tag">
+                  <span style="color: var(--redline);">●</span>
+                  <span id="aero-flow-label">WIND TUNNEL: 280 KM/H</span>
+                </div>
+
+                <!-- 8-Stage Shift Light Cluster -->
+                <div class="shift-light-bar" id="shift-light-bar" title="Tachometer Shift Lights">
+                  <div class="shift-led green" id="led-1"></div>
+                  <div class="shift-led green" id="led-2"></div>
+                  <div class="shift-led green" id="led-3"></div>
+                  <div class="shift-led amber" id="led-4"></div>
+                  <div class="shift-led amber" id="led-5"></div>
+                  <div class="shift-led amber" id="led-6"></div>
+                  <div class="shift-led red" id="led-7"></div>
+                  <div class="shift-led red" id="led-8"></div>
+                </div>
+              </div>
+
+              <!-- HUD Bottom Overlay: Tachometer Dial & Controls -->
+              <div class="hud-overlay-bottom">
+                <div class="tach-dial-box">
+                  <!-- Tachometer & Active Gear -->
+                  <div class="tach-radial" title="Tachometer & Active Gear">
+                    <svg class="tach-svg" viewBox="0 0 80 80">
+                      <circle class="tach-circle-bg" cx="40" cy="40" r="35"></circle>
+                      <circle id="tach-stroke" class="tach-circle-progress" cx="40" cy="40" r="35"></circle>
+                    </svg>
+                    <div class="tach-radial-center">
+                      <span id="gear-indicator" class="gear-number">N</span>
+                      <span class="gear-label">GEAR</span>
+                    </div>
+                  </div>
+
+                  <!-- Dynamic Engine Temp SVG Radial Gauge -->
+                  <div class="temp-radial" title="Dynamic Engine Coolant & Oil Temp">
+                    <svg class="temp-svg" viewBox="0 0 80 80">
+                      <circle class="temp-circle-bg" cx="40" cy="40" r="32"></circle>
+                      <circle id="temp-stroke" class="temp-circle-progress" cx="40" cy="40" r="32"></circle>
+                    </svg>
+                    <div class="temp-radial-center">
+                      <div class="temp-val-row">
+                        <span id="engine-temp-digits" class="temp-digits">90</span>
+                        <span id="engine-temp-unit" class="temp-unit">°C</span>
+                      </div>
+                      <span class="temp-label">ENG TEMP</span>
+                      <span id="temp-status-badge" class="temp-status-badge" style="color: var(--telemetry-green); background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.25);">NOMINAL</span>
+                    </div>
+                  </div>
+
+                  <div class="tach-readouts">
+                    <div class="tach-rpm-row">
+                      <span id="rpm-digits" class="tach-rpm-digits">950</span>
+                      <span class="tach-rpm-unit">RPM</span>
+                    </div>
+                    <div id="speed-digits" class="tach-speed-kph">0 KM/H • BOOST: 0.2 BAR</div>
+                  </div>
+                </div>
+
+                <div class="viewport-ctrls">
+                  <button id="rev-engine-btn" class="ctrl-btn active" title="Throttle Up Engine Simulation">
+                    <span>🔥</span> REV ENGINE
+                  </button>
+                  <button id="launch-mode-btn" class="ctrl-btn" title="Toggle 2-Step Anti-Lag Launch Mode">
+                    <span>🚀</span> LAUNCH MODE
+                  </button>
+                  <button id="wireframe-btn" class="ctrl-btn" title="Toggle Aero CAD Wireframe">
+                    <span>⚡</span> CAD AERO
+                  </button>
+                  <button id="color-cycle-btn" class="ctrl-btn" title="Toggle Neon Underglow Palette">
+                    <span>🎨</span> UNDERGLOW
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; padding: 0 0.25rem;">
+              <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">
+                INTERACTIVE VIEWPORT: CLICK & DRAG TO ROTATE CHASSIS
+              </span>
+              <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--nitrous-cyan);">
+                ACTIVE AERO • DUAL TURBO V8
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Powertrain Specs (Skills & Tech Arsenal) -->
+    <section id="powertrain" class="paddock-section">
+      <div class="paddock-container">
+        <div class="section-header">
+          <div class="section-kicker">[02 // POWERTRAIN ARSENAL]</div>
+          <h2 class="section-title">ENGINE BAY & POWERTRAIN SPECS</h2>
+          <p class="section-desc">
+            Hardware-calibrated technical capabilities spanning object-oriented Java architecture, high-efficiency ORM transmission, optimized relational database engines, and responsive modern frontend cockpits.
+          </p>
+        </div>
+
+        <!-- Interactive Dyno Power Curve Bench -->
+        <div class="dyno-bench carbon-border">
+          <div class="dyno-bench-top">
+            <div>
+              <div style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: #fff;">
+                LIVE DYNO RUN: HORSEPOWER & TORQUE CURVES
+              </div>
+              <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted);">
+                ENGINE MAPPING // TECH STACK CALIBRATION PROFILE
+              </div>
+            </div>
+            <div class="dyno-metric-badges">
+              <div class="dyno-metric-node">
+                <span class="dyno-metric-label">Peak Power</span>
+                <span class="dyno-metric-val" style="color: var(--redline);">99.4 HP // JAVA CORE</span>
+              </div>
+              <div class="dyno-metric-node">
+                <span class="dyno-metric-label">Max Torque</span>
+                <span class="dyno-metric-val" style="color: var(--nitrous-cyan);">680 NM // HIBERNATE & SQL</span>
+              </div>
+              <div class="dyno-metric-node">
+                <span class="dyno-metric-label">ECU Map</span>
+                <span class="dyno-metric-val" style="color: var(--telemetry-green);">STAGE 3 OPTIMIZED</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dyno-canvas-container">
+            <canvas id="dyno-chart-canvas"></canvas>
+            <div id="dyno-tooltip" class="dyno-hover-tooltip"></div>
+          </div>
+        </div>
+
+        <!-- Category Filter Tabs -->
+        <div class="powertrain-tabs">
+          <button class="tab-btn active" data-filter="all">All Systems [5]</button>
+          <button class="tab-btn" data-filter="core">Internal Combustion (Core)</button>
+          <button class="tab-btn" data-filter="transmission">Transmission (Backend)</button>
+          <button class="tab-btn" data-filter="ecu">Fuel & ECU (Databases)</button>
+          <button class="tab-btn" data-filter="aero">Aero Cockpit (Frontend)</button>
+          <button class="tab-btn" data-filter="tools">Pit Tools & Telemetry</button>
+        </div>
+
+        <!-- Powertrain Cards Grid -->
+        <div class="powertrain-grid" id="powertrain-grid">
+          <!-- Card 1: Core Java -->
+          <div class="engine-spec-card carbon-border" data-category="core">
+            <div class="spec-card-header">
+              <div class="spec-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <span class="spec-category-badge">CORE ICE // 8,500 RPM</span>
+            </div>
+            <h3 class="spec-card-title">Internal Combustion Core</h3>
+            <div class="spec-card-sub">Java Enterprise Engine & Object-Oriented Blueprint</div>
+            <div class="telemetry-tag-cloud">
+              <span class="telemetry-chip">Java (Core Java)</span>
+              <span class="telemetry-chip">OOP Architecture</span>
+              <span class="telemetry-chip">Collections Framework</span>
+              <span class="telemetry-chip">Exception Handling</span>
+              <span class="telemetry-chip">Data Structures</span>
+              <span class="telemetry-chip">Memory Optimization</span>
+            </div>
+            <div class="spec-output-bar">
+              <div class="spec-output-fill" style="width: 96%;"></div>
+            </div>
+            <div class="spec-output-meta">
+              <span>EFFICIENCY RATING: 96%</span>
+              <span>150+ ALGORITHMIC SPRINTS</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Backend & Transmission -->
+          <div class="engine-spec-card carbon-border" data-category="transmission">
+            <div class="spec-card-header">
+              <div class="spec-icon-box" style="color: var(--redline);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+              </div>
+              <span class="spec-category-badge" style="color: var(--nitrous-cyan);">DRIVETRAIN // 7-SPEED DUAL-CLUTCH</span>
+            </div>
+            <h3 class="spec-card-title">Transmission & Drivetrain</h3>
+            <div class="spec-card-sub">High-Throughput Enterprise Backend Pipelines</div>
+            <div class="telemetry-tag-cloud">
+              <span class="telemetry-chip">JDBC Connection Pooling</span>
+              <span class="telemetry-chip">Hibernate ORM</span>
+              <span class="telemetry-chip">Java Servlets</span>
+              <span class="telemetry-chip">JSP</span>
+              <span class="telemetry-chip">RESTful Web APIs</span>
+              <span class="telemetry-chip">Thread-Safe Routing</span>
+            </div>
+            <div class="spec-output-bar">
+              <div class="spec-output-fill" style="width: 92%;"></div>
+            </div>
+            <div class="spec-output-meta">
+              <span>EFFICIENCY RATING: 92%</span>
+              <span>ZERO-LATENCY ORM BRIDGES</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Database & ECU -->
+          <div class="engine-spec-card carbon-border" data-category="ecu">
+            <div class="spec-card-header">
+              <div class="spec-icon-box" style="color: var(--amber-warning);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                  <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                  <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                </svg>
+              </div>
+              <span class="spec-category-badge" style="color: var(--amber-warning);">FUEL INJECTION // ECU TIMING</span>
+            </div>
+            <h3 class="spec-card-title">Fuel Injection & ECU</h3>
+            <div class="spec-card-sub">Relational Schema Engineering & Query Tuning</div>
+            <div class="telemetry-tag-cloud">
+              <span class="telemetry-chip">MySQL</span>
+              <span class="telemetry-chip">SQL DDL / DML / DQL</span>
+              <span class="telemetry-chip">Schema Normalization</span>
+              <span class="telemetry-chip">Indexing & Query Tuning</span>
+              <span class="telemetry-chip">Complex Joins & Subqueries</span>
+              <span class="telemetry-chip">ACID Guarantees</span>
+            </div>
+            <div class="spec-output-bar">
+              <div class="spec-output-fill" style="width: 90%;"></div>
+            </div>
+            <div class="spec-output-meta">
+              <span>EFFICIENCY RATING: 90%</span>
+              <span>SUB-10MS QUERY BENCHMARK</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Frontend Aero & Cockpit UI -->
+          <div class="engine-spec-card carbon-border" data-category="aero">
+            <div class="spec-card-header">
+              <div class="spec-icon-box" style="color: var(--telemetry-green);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+              </div>
+              <span class="spec-category-badge" style="color: var(--telemetry-green);">AERO COCKPIT // HEAD-UP DISPLAY</span>
+            </div>
+            <h3 class="spec-card-title">Aero & Cockpit UI</h3>
+            <div class="spec-card-sub">Ultra-Smooth Interactive User Interfaces</div>
+            <div class="telemetry-tag-cloud">
+              <span class="telemetry-chip">HTML5 / Semantic DOM</span>
+              <span class="telemetry-chip">CSS3 Animations</span>
+              <span class="telemetry-chip">JavaScript (ES6+)</span>
+              <span class="telemetry-chip">React.js</span>
+              <span class="telemetry-chip">Bootstrap</span>
+              <span class="telemetry-chip">Recharts / Data Viz</span>
+            </div>
+            <div class="spec-output-bar">
+              <div class="spec-output-fill" style="width: 88%;"></div>
+            </div>
+            <div class="spec-output-meta">
+              <span>EFFICIENCY RATING: 88%</span>
+              <span>60 FPS SMOOTH RENDER</span>
+            </div>
+          </div>
+
+          <!-- Card 5: Pit Tools & Telemetry -->
+          <div class="engine-spec-card carbon-border" data-category="tools">
+            <div class="spec-card-header">
+              <div class="spec-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+              </div>
+              <span class="spec-category-badge">PIT TOOLS // TELEMETRY SUITE</span>
+            </div>
+            <h3 class="spec-card-title">Pit Crew Tools</h3>
+            <div class="spec-card-sub">Version Control, Build Pipelines & Diagnostics</div>
+            <div class="telemetry-tag-cloud">
+              <span class="telemetry-chip">Git Version Control</span>
+              <span class="telemetry-chip">GitHub CI/CD</span>
+              <span class="telemetry-chip">MySQL Workbench</span>
+              <span class="telemetry-chip">Eclipse IDE</span>
+              <span class="telemetry-chip">VS Code</span>
+              <span class="telemetry-chip">Axios & Postman</span>
+            </div>
+            <div class="spec-output-bar">
+              <div class="spec-output-fill" style="width: 94%;"></div>
+            </div>
+            <div class="spec-output-meta">
+              <span>EFFICIENCY RATING: 94%</span>
+              <span>PRECISION PADDOCK CALIBRATION</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dyno Runs (Featured Track Projects) -->
+    <section id="dyno-runs" class="paddock-section">
+      <div class="paddock-container">
+        <div class="section-header">
+          <div class="section-kicker">[03 // DYNO RUNS — TRACK PROJECTS]</div>
+          <h2 class="section-title">TUNED VEHICLES & RACE MACHINES</h2>
+          <p class="section-desc">
+            Production-grade software architectures battle-tested under simulated track conditions. Full-stack execution featuring dynamic data visualization and generative AI inspection pipelines.
+          </p>
+        </div>
+
+        <div class="projects-grid">
+          <!-- Machine 01: Day Wise — Personal Finance Tracker -->
+          <div class="project-chassis-card carbon-border">
+            <div class="card-telemetry-header">
+              <div class="card-machine-id">MACHINE 01 // DAY WISE FINANCIAL TRACKER</div>
+              <div class="card-status-indicator">
+                <span class="pulse-beacon" style="width: 6px; height: 6px;"></span>
+                <span>REAL-TIME CASHFLOW TELEMETRY</span>
+              </div>
+            </div>
+
+            <div class="project-card-body">
+              <div class="project-info-side">
+                <h3 class="project-name">Day Wise — Personal Finance Tracker</h3>
+                <div class="project-stack-row">
+                  <span class="stack-pill">React.js</span>
+                  <span class="stack-pill">Vite</span>
+                  <span class="stack-pill">Material UI</span>
+                  <span class="stack-pill">Recharts</span>
+                  <span class="stack-pill">Local Persistence</span>
+                </div>
+                <p class="project-spec-desc">
+                  Engineered a real-time personal finance monitor with user authentication, custom CRUD transaction management, and responsive telemetry charts. Designed to visualize cashflow streams, budget thresholds, and historical spending patterns with sub-second feedback.
+                </p>
+                <ul class="project-specs-list">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Dynamic analytics dashboard leveraging Recharts to visualize income, expenses, and net cashflow trends.</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Custom CRUD transaction ledger with instantaneous state synchronization and zero latency.</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Responsive dark & light cockpit UI styled with Material UI components and instant notification alerts.</span>
+                  </li>
+                </ul>
+
+                <div class="project-actions">
+                  <a href="https://github.com/Nikhil5758" target="_blank" rel="noopener noreferrer" class="btn-launch" style="padding: 0.65rem 1.25rem; font-size: 0.82rem;">
+                    <span>GIT REPO SPEC</span>
+                  </a>
+                  <button onclick="simulateFinanceData()" class="btn-paddock" style="padding: 0.65rem 1.25rem; font-size: 0.82rem;">
+                    <span>SIMULATE TELEMETRY RUN</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Interactive Live Preview Simulation -->
+              <div class="project-interactive-preview">
+                <div class="preview-terminal-header">
+                  <span class="preview-terminal-title">LIVE TELEMETRY MONITOR // CASHFLOW VS EXPENSES</span>
+                  <span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--telemetry-green);">SYNC: ACTIVE</span>
+                </div>
+
+                <div class="mini-chart-wrap" id="finance-chart-bars">
+                  <div class="chart-col">
+                    <div class="chart-bar-income" style="height: 65%;" title="Mon Income: $650"></div>
+                    <div class="chart-bar-expense" style="height: 35%;" title="Mon Expense: $350"></div>
+                    <span class="chart-col-label">MON</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="chart-bar-income" style="height: 80%;" title="Tue Income: $800"></div>
+                    <div class="chart-bar-expense" style="height: 50%;" title="Tue Expense: $500"></div>
+                    <span class="chart-col-label">TUE</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="chart-bar-income" style="height: 55%;" title="Wed Income: $550"></div>
+                    <div class="chart-bar-expense" style="height: 40%;" title="Wed Expense: $400"></div>
+                    <span class="chart-col-label">WED</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="chart-bar-income" style="height: 90%;" title="Thu Income: $900"></div>
+                    <div class="chart-bar-expense" style="height: 60%;" title="Thu Expense: $600"></div>
+                    <span class="chart-col-label">THU</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="chart-bar-income" style="height: 70%;" title="Fri Income: $700"></div>
+                    <div class="chart-bar-expense" style="height: 45%;" title="Fri Expense: $450"></div>
+                    <span class="chart-col-label">FRI</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="chart-bar-income" style="height: 95%;" title="Sat Income: $950"></div>
+                    <div class="chart-bar-expense" style="height: 30%;" title="Sat Expense: $300"></div>
+                    <span class="chart-col-label">SAT</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="chart-bar-income" style="height: 85%;" title="Sun Income: $850"></div>
+                    <div class="chart-bar-expense" style="height: 25%;" title="Sun Expense: $250"></div>
+                    <span class="chart-col-label">SUN</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 0.6rem; border-top: 1px solid rgba(255, 255, 255, 0.08); font-family: var(--font-mono); font-size: 0.72rem;">
+                  <span style="color: var(--telemetry-green);">● INCOME: +$5,400.00</span>
+                  <span style="color: var(--redline);">● EXPENSES: -$2,850.00</span>
+                  <span style="color: var(--nitrous-cyan);">NET: +$2,550.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Machine 02: AI-Powered Code Reviewer -->
+          <div class="project-chassis-card carbon-border">
+            <div class="card-telemetry-header">
+              <div class="card-machine-id">MACHINE 02 // AUTONOMOUS AI CODE INSPECTOR</div>
+              <div class="card-status-indicator">
+                <span class="pulse-beacon" style="width: 6px; height: 6px; background: var(--nitrous-cyan); box-shadow: 0 0 8px var(--nitrous-cyan);"></span>
+                <span style="color: var(--nitrous-cyan);">AI SCANNER: STANDBY</span>
+              </div>
+            </div>
+
+            <div class="project-card-body">
+              <div class="project-info-side">
+                <h3 class="project-name">AI-Powered Code Reviewer</h3>
+                <div class="project-stack-row">
+                  <span class="stack-pill">React.js</span>
+                  <span class="stack-pill">Node.js</span>
+                  <span class="stack-pill">Express.js</span>
+                  <span class="stack-pill">Google Gemini API</span>
+                  <span class="stack-pill">Axios</span>
+                  <span class="stack-pill">Prism.js</span>
+                </div>
+                <p class="project-spec-desc">
+                  Built an autonomous AI code inspection suite leveraging the Google Gemini API to analyze syntax vulnerabilities, time-complexity bottlenecks, and architecture anti-patterns in seconds. Engineered fault-tolerant REST endpoints via Axios with formatted diagnostic reports.
+                </p>
+                <ul class="project-specs-list">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Autonomous AI code audit system analyzing algorithmic complexity, null safety, and memory allocation.</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Resilient Express.js backend proxy handling rate limits, token timeouts, and streaming responses.</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Prism.js syntax highlighter with line-by-line inspection callouts and remediation diffs.</span>
+                  </li>
+                </ul>
+
+                <div class="project-actions">
+                  <a href="https://github.com/Nikhil5758" target="_blank" rel="noopener noreferrer" class="btn-launch" style="padding: 0.65rem 1.25rem; font-size: 0.82rem;">
+                    <span>GIT REPO SPEC</span>
+                  </a>
+                  <button id="run-audit-btn" onclick="runSimulatedCodeAudit()" class="btn-paddock" style="padding: 0.65rem 1.25rem; font-size: 0.82rem;">
+                    <span>RUN TELEMETRY INSPECTION</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Interactive Code Terminal Simulator -->
+              <div class="project-interactive-preview">
+                <div class="preview-terminal-header">
+                  <span class="preview-terminal-title">CODE TELEMETRY ANALYZER // V8 RUNTIME</span>
+                  <span id="audit-status-tag" style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--amber-warning);">READY FOR SCAN</span>
+                </div>
+
+                <div class="code-audit-terminal" id="audit-terminal-screen">
+                  <div><span class="code-line-dim">01</span> <span class="code-line-keyword">public class</span> <span class="code-line-class">TransactionEngine</span> {</div>
+                  <div><span class="code-line-dim">02</span>   <span class="code-line-keyword">public void</span> <span class="code-line-class">processLedger</span>(List&lt;Record&gt; stream) {</div>
+                  <div><span class="code-line-dim">03</span>     <span class="code-line-comment">// Memory leak &amp; O(n^2) hotspot detected in raw nested loop</span></div>
+                  <div><span class="code-line-dim">04</span>     <span class="code-line-keyword">for</span>(Record r : stream) { db.queryDirect(r.getId()); }</div>
+                  <div><span class="code-line-dim">05</span>   }</div>
+                  <div><span class="code-line-dim">06</span> }</div>
+                  <div id="audit-results-stream" style="margin-top: 0.5rem; color: var(--telemetry-green); display: none;">
+                    &gt; [AI INSPECTION RESULT]:<br>
+                    &gt; [1] Vulnerability: N+1 query loop. Refactor to batch JDBC fetch.<br>
+                    &gt; [2] Complexity: Reduced O(N^2) -&gt; O(N log N) via hash indexing.<br>
+                    &gt; [3] Thread Safety: Enforce volatile synchronized locking.
+                  </div>
+                </div>
+
+                <button class="audit-trigger-btn" onclick="runSimulatedCodeAudit()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  EXECUTE INSTANT GEMINI AI AUDIT
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Track Log (Experience & Flight Path) -->
+    <section id="track-log" class="paddock-section">
+      <div class="paddock-container">
+        <div class="section-header">
+          <div class="section-kicker">[04 // TRACK LOG & FLIGHT PATH]</div>
+          <h2 class="section-title">CIRCUIT EXPERIENCE & SPRINT LOG</h2>
+          <p class="section-desc">
+            Telemetry breakdown of professional development laps, intensive engineering training, and algorithmic test runs on high-load circuits.
+          </p>
+        </div>
+
+        <div class="circuit-timeline">
+          <!-- Timeline Lap 01: JSpiders -->
+          <div class="timeline-node">
+            <div class="timeline-checkpoint">
+              <div class="checkpoint-dot"></div>
+            </div>
+            <div class="timeline-card carbon-border">
+              <div class="timeline-header-row">
+                <div>
+                  <h3 class="timeline-role">Java Full Stack Development Training</h3>
+                  <div class="timeline-org">JSpiders, Bengaluru</div>
+                </div>
+                <div class="timeline-dates">JULY 2026 – PRESENT // CURRENT LAP</div>
+              </div>
+
+              <p style="color: var(--text-secondary); font-size: 0.98rem; margin-bottom: 1.25rem;">
+                Undergoing rigorous enterprise-grade development training focused on building production-ready multi-tier Java backends, scalable relational database designs, and high-performance algorithms.
+              </p>
+
+              <!-- 4 Telemetry Sector Splits -->
+              <div class="sectors-grid">
+                <div class="sector-box">
+                  <div class="sector-num">SECTOR 01 // CORE JAVA</div>
+                  <div class="sector-desc">
+                    Architected Java applications employing OOP design patterns, custom exception handling architectures, and efficient Java Collections memory pipelines.
+                  </div>
+                </div>
+
+                <div class="sector-box">
+                  <div class="sector-num">SECTOR 02 // DATABASE TUNING</div>
+                  <div class="sector-desc">
+                    Engineered normalized relational database schemas and optimized high-load queries, indexing mechanisms, and subqueries in MySQL.
+                  </div>
+                </div>
+
+                <div class="sector-box">
+                  <div class="sector-num">SECTOR 03 // ORM &amp; PERSISTENCE</div>
+                  <div class="sector-desc">
+                    Built persistent data-access layers bridging Java backends with relational databases via JDBC connection pooling and Hibernate ORM.
+                  </div>
+                </div>
+
+                <div class="sector-box">
+                  <div class="sector-num">SECTOR 04 // ALGORITHMIC SPEED</div>
+                  <div class="sector-desc">
+                    Solved 150+ algorithmic challenges focused on optimal data structures, asymptotic runtime complexity, and heap memory efficiency.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Driver Qualifications & Badges (Education & Certifications) -->
+    <section id="qualifications" class="paddock-section">
+      <div class="paddock-container">
+        <div class="section-header">
+          <div class="section-kicker">[QUALIFICATIONS & BADGES]</div>
+          <h2 class="section-title">RACING ACADEMY & TUNING BADGES</h2>
+          <p class="section-desc">
+            Formal engineering foundation and accredited industry certifications validating backend architecture and web development expertise.
+          </p>
+        </div>
+
+        <div class="qual-grid">
+          <!-- Left: Racing Academy (Education) -->
+          <div class="paddock-card carbon-border">
+            <h3 class="paddock-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+              </svg>
+              RACING ACADEMY (EDUCATION)
+            </h3>
+
+            <div class="academy-item">
+              <div class="academy-institution">Oriental Institute of Science and Technology</div>
+              <div class="academy-degree">B.Tech in Computer Science &amp; Engineering</div>
+              <div class="academy-meta">
+                <span>2022 – 2026</span>
+                <span>•</span>
+                <span class="academy-cgpa">CGPA: 7.50 / 10.0</span>
+                <span>•</span>
+                <span>Bhopal, Madhya Pradesh</span>
+              </div>
+            </div>
+
+            <div class="academy-item">
+              <div class="academy-institution">Shining Glorious Scholars Public School</div>
+              <div class="academy-degree">Senior Secondary (Class XII - PCM) &amp; Secondary (Class X)</div>
+              <div class="academy-meta">
+                <span>Central Board of Secondary Education (CBSE)</span>
+                <span>•</span>
+                <span>Gwalior, Madhya Pradesh</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Tuning Badges (Certifications) -->
+          <div class="paddock-card carbon-border">
+            <h3 class="paddock-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="7"></circle>
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+              </svg>
+              TUNING BADGES (CERTIFICATIONS)
+            </h3>
+
+            <div class="tuning-badges-list">
+              <div class="tuning-badge-row">
+                <div class="badge-info">
+                  <span class="badge-name">Programming in Java</span>
+                  <span class="badge-issuer">Apna College • Core Java, OOP &amp; Data Structures</span>
+                </div>
+                <span class="badge-stamp">VERIFIED</span>
+              </div>
+
+              <div class="tuning-badge-row">
+                <div class="badge-info">
+                  <span class="badge-name">MERN Stack Development</span>
+                  <span class="badge-issuer">Apna College • Full-Stack Web Architecture</span>
+                </div>
+                <span class="badge-stamp">VERIFIED</span>
+              </div>
+
+              <div class="tuning-badge-row">
+                <div class="badge-info">
+                  <span class="badge-name">Introduction to Front-End Development</span>
+                  <span class="badge-issuer">Meta / Coursera • Modern Web Standards &amp; UI</span>
+                </div>
+                <span class="badge-stamp">VERIFIED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pit Stop (Contact & Transmission) -->
+    <section id="pit-stop" class="paddock-section">
+      <div class="paddock-container">
+        <div class="section-header">
+          <div class="section-kicker">[05 // PIT STOP & TRANSMISSION]</div>
+          <h2 class="section-title">PIT CREW COMMS TERMINAL</h2>
+          <p class="section-desc">
+            Direct telemetry transmission line to Nikhil Chourasiya. Open for high-performance Java backend engineering roles, full-stack microservices development, and technical collaborations.
+          </p>
+        </div>
+
+        <div class="pitstop-grid">
+          <!-- Left: Telemetry Contact Form -->
+          <div class="terminal-form-card carbon-border">
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--redline); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.25rem;">
+              DIRECT COMMS ENCRYPTION // 256-BIT SECURE
+            </div>
+
+            <form id="paddock-comms-form" onsubmit="handleCommsSubmit(event)">
+              <div class="form-group">
+                <label class="form-label" for="driver-name">Pilot / Driver Name</label>
+                <input class="form-input" type="text" id="driver-name" placeholder="e.g., Engineering Lead / Recruiter" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="driver-email">Return Frequency / Email</label>
+                <input class="form-input" type="email" id="driver-email" placeholder="name@company.com" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="driver-msg">Mission Payload / Message</label>
+                <textarea class="form-textarea" id="driver-msg" rows="4" placeholder="Brief us on the role, architecture challenge, or engineering opportunity..." required></textarea>
+              </div>
+
+              <button type="submit" id="send-comms-btn" class="btn-launch" style="width: 100%;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                TRANSMIT SECURE TELEMETRY PAYLOAD
+              </button>
+            </form>
+
+            <div class="terminal-output-box" id="comms-terminal-log">
+              &gt; STATUS: PADDOCK FREQUENCY READY. AWAITING PAYLOAD...
+            </div>
+          </div>
+
+          <!-- Right: Direct Comms & Driver Links -->
+          <div class="comms-info-card">
+            <!-- Email Comms -->
+            <div class="comms-card carbon-border">
+              <div class="comms-card-label">Official Telemetry Channel (Email)</div>
+              <div class="comms-card-val" id="email-text">nikhilchourasiyaoffice@gmail.com</div>
+              <button class="copy-action-btn" onclick="copyToClipboard('nikhilchourasiyaoffice@gmail.com', 'Email Frequency Copied!')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                COPY FREQUENCY
+              </button>
+            </div>
+
+            <!-- Phone Comms -->
+            <div class="comms-card carbon-border">
+              <div class="comms-card-label">Direct Voice Comms (Mobile)</div>
+              <div class="comms-card-val">+91-7415621812</div>
+              <a href="tel:+917415621812" class="copy-action-btn" style="text-decoration: none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                CALL PADDOCK
+              </a>
+            </div>
+
+            <!-- Social Links Grid -->
+            <div class="driver-links-grid">
+              <a href="https://github.com/Nikhil5758" target="_blank" rel="noopener noreferrer" class="driver-link-item carbon-border">
+                <div class="driver-link-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                </div>
+                <div class="driver-link-text">
+                  <span class="driver-link-title">GitHub</span>
+                  <span class="driver-link-handle">@Nikhil5758</span>
+                </div>
+              </a>
+
+              <a href="https://www.linkedin.com/in/nikhilchourasiya25" target="_blank" rel="noopener noreferrer" class="driver-link-item carbon-border">
+                <div class="driver-link-icon" style="color: #0077b5;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                </div>
+                <div class="driver-link-text">
+                  <span class="driver-link-title">LinkedIn</span>
+                  <span class="driver-link-handle">@nikhilchourasiya25</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="hud-footer">
+      <div class="paddock-container">
+        <div class="footer-inner">
+          <div class="footer-left">
+            <span class="footer-brand">NIKHIL CHOURASIYA // TELEMETRY CHASSIS BUILD 2026</span>
+            <span class="footer-coords">BENGALURU PADDOCK • B.TECH CSE • HIGH-PERFORMANCE JAVA BACKEND</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div id="paddock-time" class="paddock-clock">UTC 00:00:00</div>
+            <a href="#hero" class="copy-action-btn" style="text-decoration: none;">
+              <span>▲ TOP</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Toast Notification Element -->
+    <div id="telemetry-toast">
+      <span style="color: var(--telemetry-green);">✔</span>
+      <span id="toast-message">Telemetry notification</span>
+    </div>
+
+    <!-- Telemetry & WebGL Engine Scripts -->
+    <script>
+      /* ==========================================================
+         1. AUDIO SYNTHESIZER (Multi-Oscillator Web Audio API Engine)
+         ========================================================== */
+      class HypercarAudioEngine {
+        constructor() {
+          this.ctx = null;
+          this.isPlaying = false;
+          this.masterGain = null;
+          this.osc1 = null;
+          this.osc2 = null;
+          this.oscSub = null;
+          this.filter = null;
+          this.noiseNode = null;
+        }
+
+        init() {
+          if (this.ctx) return;
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+          this.masterGain.connect(this.ctx.destination);
+
+          // Low-pass filter simulating engine cylinder acoustics
+          this.filter = this.ctx.createBiquadFilter();
+          this.filter.type = 'lowpass';
+          this.filter.frequency.setValueAtTime(450, this.ctx.currentTime);
+          this.filter.Q.setValueAtTime(3.5, this.ctx.currentTime);
+          this.filter.connect(this.masterGain);
+
+          // Oscillator 1: Main fundamental
+          this.osc1 = this.ctx.createOscillator();
+          this.osc1.type = 'sawtooth';
+          this.osc1.frequency.setValueAtTime(55, this.ctx.currentTime);
+          this.osc1.connect(this.filter);
+
+          // Oscillator 2: Harmonic
+          this.osc2 = this.ctx.createOscillator();
+          this.osc2.type = 'triangle';
+          this.osc2.frequency.setValueAtTime(110, this.ctx.currentTime);
+          this.osc2.connect(this.filter);
+
+          // Sub-bass rumble
+          this.oscSub = this.ctx.createOscillator();
+          this.oscSub.type = 'sine';
+          this.oscSub.frequency.setValueAtTime(28, this.ctx.currentTime);
+          this.oscSub.connect(this.masterGain);
+
+          this.osc1.start();
+          this.osc2.start();
+          this.oscSub.start();
+          this.isPlaying = true;
+        }
+
+        setRPM(rpm) {
+          if (!this.ctx || !this.isPlaying) return;
+          // Map 800 - 9000 RPM to acoustic frequency
+          const baseFreq = 30 + (rpm / 9000) * 160;
+          const now = this.ctx.currentTime;
+          this.osc1.frequency.setTargetAtTime(baseFreq, now, 0.05);
+          this.osc2.frequency.setTargetAtTime(baseFreq * 1.5, now, 0.05);
+          this.oscSub.frequency.setTargetAtTime(baseFreq * 0.5, now, 0.05);
+          this.filter.frequency.setTargetAtTime(300 + (rpm / 9000) * 2200, now, 0.05);
+        }
+
+        playBlowOff() {
+          if (!this.ctx || !this.isPlaying) return;
+          // Synthesize turbo blow-off release
+          const bufferSize = this.ctx.sampleRate * 0.35;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+
+          const bpf = this.ctx.createBiquadFilter();
+          bpf.type = 'bandpass';
+          bpf.frequency.setValueAtTime(1800, this.ctx.currentTime);
+          bpf.Q.setValueAtTime(4.0, this.ctx.currentTime);
+
+          const noiseGain = this.ctx.createGain();
+          noiseGain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          noiseGain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+
+          noise.connect(bpf);
+          bpf.connect(noiseGain);
+          noiseGain.connect(this.masterGain);
+          noise.start();
+        }
+
+        toggle() {
+          if (!this.ctx) {
+            this.init();
+            return true;
+          }
+          if (this.isPlaying) {
+            this.masterGain.gain.setValueAtTime(0, this.ctx.currentTime);
+            this.isPlaying = false;
+            return false;
+          } else {
+            this.masterGain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+            this.isPlaying = true;
+            return true;
+          }
+        }
+      }
+
+      const audioEngine = new HypercarAudioEngine();
+
+      /* ==========================================================
+         2. THREE.JS 3D HYPERCAR SCENE & WIND TUNNEL AERODYNAMICS
+         ========================================================== */
+      let scene, camera, renderer, carGroup;
+      let wheels = [];
+      let brakeDiscs = [];
+      let streamlines = [];
+      let groundGrid;
+      let underglowLight;
+      let exhaustParticles;
+      let isWireframe = false;
+      let currentColorTheme = 'cyan'; // 'cyan' or 'red'
+      let isRevving = false;
+      let isLaunchMode = false;
+      let targetRPM = 950;
+      let currentRPM = 950;
+      let currentGear = 'N';
+      let speedKPH = 0;
+      let engineTemp = 90.0;
+      const IDLE_TEMP = 90.0;
+      const MAX_TEMP = 126.0;
+
+      // Mouse drag controls for smooth rotation
+      let isDragging = false;
+      let previousMousePosition = { x: 0, y: 0 };
+      let targetRotationY = 0.45;
+      let targetRotationX = 0.15;
+      let currentRotationY = 0.45;
+      let currentRotationX = 0.15;
+
+      function initThreeScene() {
+        const container = document.getElementById('viewport-container');
+        const canvas = document.getElementById('webgl-canvas');
+        if (!container || !canvas || typeof THREE === 'undefined') return;
+
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        // Scene
+        scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0a0c10, 0.035);
+
+        // Camera
+        camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
+        camera.position.set(4.5, 2.2, 5.5);
+        camera.lookAt(0, 0.3, 0);
+
+        // Renderer
+        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.25;
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
+        keyLight.position.set(5, 8, 4);
+        scene.add(keyLight);
+
+        const rimLightCyan = new THREE.DirectionalLight(0x00f0ff, 3.0);
+        rimLightCyan.position.set(-5, 2, -4);
+        scene.add(rimLightCyan);
+
+        const rimLightRed = new THREE.DirectionalLight(0xff1e42, 2.0);
+        rimLightRed.position.set(4, 1.5, -4);
+        scene.add(rimLightRed);
+
+        // Ground asphalt grid
+        const gridHelper = new THREE.GridHelper(40, 40, 0x00f0ff, 0x1f2633);
+        gridHelper.position.y = -0.01;
+        scene.add(gridHelper);
+        groundGrid = gridHelper;
+
+        // Build procedural hypercar
+        buildSupercar();
+
+        // Build Aerodynamic Wind-Tunnel Streamlines
+        buildStreamlines();
+
+        // Build Exhaust particle sparks
+        buildExhaustSparks();
+
+        // Mouse & Touch Interaction
+        canvas.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        window.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          const deltaX = e.clientX - previousMousePosition.x;
+          const deltaY = e.clientY - previousMousePosition.y;
+          targetRotationY += deltaX * 0.008;
+          targetRotationX += deltaY * 0.005;
+          targetRotationX = Math.max(-0.1, Math.min(0.65, targetRotationX));
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        // Touch support for mobile
+        canvas.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+            isDragging = true;
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          }
+        }, { passive: true });
+        window.addEventListener('touchend', () => { isDragging = false; });
+        canvas.addEventListener('touchmove', (e) => {
+          if (!isDragging || e.touches.length !== 1) return;
+          const deltaX = e.touches[0].clientX - previousMousePosition.x;
+          const deltaY = e.touches[0].clientY - previousMousePosition.y;
+          targetRotationY += deltaX * 0.008;
+          targetRotationX += deltaY * 0.005;
+          targetRotationX = Math.max(-0.1, Math.min(0.65, targetRotationX));
+          previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }, { passive: true });
+
+        // Resize handler
+        window.addEventListener('resize', onWindowResize);
+
+        // Animation loop
+        animate();
+      }
+
+      function buildSupercar() {
+        carGroup = new THREE.Group();
+
+        // Materials
+        const carbonBodyMat = new THREE.MeshStandardMaterial({
+          color: 0x111317,
+          metalness: 0.9,
+          roughness: 0.22,
+        });
+
+        const accentCarbonMat = new THREE.MeshStandardMaterial({
+          color: 0x07080a,
+          metalness: 0.8,
+          roughness: 0.35,
+        });
+
+        const glassMat = new THREE.MeshStandardMaterial({
+          color: 0x05070a,
+          metalness: 0.95,
+          roughness: 0.05,
+          transparent: true,
+          opacity: 0.88,
+        });
+
+        const cyanEmissiveMat = new THREE.MeshStandardMaterial({
+          color: 0x00f0ff,
+          emissive: 0x00f0ff,
+          emissiveIntensity: 2.5,
+        });
+
+        const redEmissiveMat = new THREE.MeshStandardMaterial({
+          color: 0xff1e42,
+          emissive: 0xff1e42,
+          emissiveIntensity: 3.0,
+        });
+
+        const brakeDiscMat = new THREE.MeshStandardMaterial({
+          color: 0x444444,
+          metalness: 0.9,
+          roughness: 0.3,
+          emissive: 0xff3300,
+          emissiveIntensity: 0.2,
+        });
+
+        // 1. Lower Chassis base
+        const baseGeo = new THREE.BoxGeometry(1.8, 0.22, 3.8);
+        const baseMesh = new THREE.Mesh(baseGeo, carbonBodyMat);
+        baseMesh.position.y = 0.28;
+        carGroup.add(baseMesh);
+
+        // 2. Cockpit Canopy / Aerodynamic Greenhouse
+        const canopyGeo = new THREE.ConeGeometry(0.85, 1.4, 4);
+        canopyGeo.rotateY(Math.PI / 4);
+        canopyGeo.scale(1.2, 0.55, 1.8);
+        const canopyMesh = new THREE.Mesh(canopyGeo, glassMat);
+        canopyMesh.position.set(0, 0.62, -0.15);
+        carGroup.add(canopyMesh);
+
+        // 3. Front Nose & Hood Scoop
+        const hoodGeo = new THREE.BoxGeometry(1.65, 0.16, 1.3);
+        const hoodMesh = new THREE.Mesh(hoodGeo, carbonBodyMat);
+        hoodMesh.position.set(0, 0.36, 1.35);
+        hoodMesh.rotation.x = 0.08;
+        carGroup.add(hoodMesh);
+
+        // 4. Front Splitter (Ground effect aerodynamic blade)
+        const splitterGeo = new THREE.BoxGeometry(1.9, 0.05, 0.45);
+        const splitterMesh = new THREE.Mesh(splitterGeo, accentCarbonMat);
+        splitterMesh.position.set(0, 0.15, 2.05);
+        carGroup.add(splitterMesh);
+
+        // Splitter neon edge
+        const splitterStripGeo = new THREE.BoxGeometry(1.88, 0.02, 0.04);
+        const splitterStrip = new THREE.Mesh(splitterStripGeo, cyanEmissiveMat);
+        splitterStrip.position.set(0, 0.17, 2.27);
+        carGroup.add(splitterStrip);
+
+        // 5. LED Laser Headlight Strips (Left & Right)
+        const headLightGeo = new THREE.BoxGeometry(0.42, 0.04, 0.18);
+        const leftHead = new THREE.Mesh(headLightGeo, cyanEmissiveMat);
+        leftHead.position.set(-0.62, 0.4, 1.95);
+        leftHead.rotation.y = -0.15;
+        const rightHead = new THREE.Mesh(headLightGeo, cyanEmissiveMat);
+        rightHead.position.set(0.62, 0.4, 1.95);
+        rightHead.rotation.y = 0.15;
+        carGroup.add(leftHead);
+        carGroup.add(rightHead);
+
+        // 6. Rear Engine Deck & Diffuser
+        const rearDeckGeo = new THREE.BoxGeometry(1.7, 0.22, 1.4);
+        const rearDeckMesh = new THREE.Mesh(rearDeckGeo, carbonBodyMat);
+        rearDeckMesh.position.set(0, 0.38, -1.35);
+        rearDeckMesh.rotation.x = -0.06;
+        carGroup.add(rearDeckMesh);
+
+        // Rear Full-width LED Light Blade (Koenigsegg / Bugatti redline)
+        const rearBladeGeo = new THREE.BoxGeometry(1.72, 0.05, 0.05);
+        const rearBlade = new THREE.Mesh(rearBladeGeo, redEmissiveMat);
+        rearBlade.position.set(0, 0.42, -2.06);
+        carGroup.add(rearBlade);
+
+        // Active Rear Wing Spoiler & Endplates
+        const wingGeo = new THREE.BoxGeometry(2.05, 0.04, 0.42);
+        const wingMesh = new THREE.Mesh(wingGeo, accentCarbonMat);
+        wingMesh.position.set(0, 0.85, -1.85);
+        wingMesh.rotation.x = -0.08;
+        carGroup.add(wingMesh);
+
+        // Wing Pylons
+        const pylonGeo = new THREE.BoxGeometry(0.05, 0.4, 0.25);
+        const leftPylon = new THREE.Mesh(pylonGeo, accentCarbonMat);
+        leftPylon.position.set(-0.45, 0.65, -1.82);
+        const rightPylon = new THREE.Mesh(pylonGeo, accentCarbonMat);
+        rightPylon.position.set(0.45, 0.65, -1.82);
+        carGroup.add(leftPylon);
+        carGroup.add(rightPylon);
+
+        // Dual Center Exhaust Tips
+        const exhaustGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.2, 16);
+        exhaustGeo.rotateX(Math.PI / 2);
+        const leftExhaust = new THREE.Mesh(exhaustGeo, accentCarbonMat);
+        leftExhaust.position.set(-0.16, 0.28, -2.0);
+        const rightExhaust = new THREE.Mesh(exhaustGeo, accentCarbonMat);
+        rightExhaust.position.set(0.16, 0.28, -2.0);
+        carGroup.add(leftExhaust);
+        carGroup.add(rightExhaust);
+
+        // 7. 4 High-Performance Alloy Wheels with glowing Brake Discs
+        const wheelPositions = [
+          { x: -0.96, y: 0.32, z: 1.15 },  // Front Left
+          { x: 0.96, y: 0.32, z: 1.15 },   // Front Right
+          { x: -0.98, y: 0.34, z: -1.15 }, // Rear Left
+          { x: 0.98, y: 0.34, z: -1.15 },  // Rear Right
+        ];
+
+        wheels = [];
+        brakeDiscs = [];
+
+        wheelPositions.forEach((pos, idx) => {
+          const wheelAssembly = new THREE.Group();
+
+          // Tire
+          const tireGeo = new THREE.CylinderGeometry(0.33, 0.33, 0.24, 24);
+          tireGeo.rotateZ(Math.PI / 2);
+          const tireMat = new THREE.MeshStandardMaterial({ color: 0x15161a, roughness: 0.85 });
+          const tire = new THREE.Mesh(tireGeo, tireMat);
+          wheelAssembly.add(tire);
+
+          // Rim Spokes
+          const rimGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.25, 12);
+          rimGeo.rotateZ(Math.PI / 2);
+          const rimMat = new THREE.MeshStandardMaterial({ color: 0x8892a0, metalness: 0.9, roughness: 0.2 });
+          const rim = new THREE.Mesh(rimGeo, rimMat);
+          wheelAssembly.add(rim);
+
+          // Brake Disc
+          const discGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.04, 16);
+          discGeo.rotateZ(Math.PI / 2);
+          const disc = new THREE.Mesh(discGeo, brakeDiscMat.clone());
+          wheelAssembly.add(disc);
+          brakeDiscs.push(disc);
+
+          wheelAssembly.position.set(pos.x, pos.y, pos.z);
+          carGroup.add(wheelAssembly);
+          wheels.push(wheelAssembly);
+        });
+
+        // 8. Underglow Neon Light
+        underglowLight = new THREE.PointLight(0x00f0ff, 4.0, 3.5);
+        underglowLight.position.set(0, 0.1, 0);
+        carGroup.add(underglowLight);
+
+        scene.add(carGroup);
+      }
+
+      function buildStreamlines() {
+        const streamCount = 35;
+        const lineMat = new THREE.LineBasicMaterial({
+          color: 0x00f0ff,
+          transparent: true,
+          opacity: 0.45,
+          blending: THREE.AdditiveBlending
+        });
+
+        for (let i = 0; i < streamCount; i++) {
+          const points = [];
+          const startZ = -12 - Math.random() * 15;
+          const endZ = startZ + 3 + Math.random() * 4;
+          const x = (Math.random() - 0.5) * 5;
+          const y = 0.1 + Math.random() * 1.5;
+
+          points.push(new THREE.Vector3(x, y, startZ));
+          points.push(new THREE.Vector3(x, y, endZ));
+
+          const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+          const line = new THREE.Line(lineGeo, lineMat.clone());
+          line.userData = {
+            speed: 0.25 + Math.random() * 0.35,
+            length: endZ - startZ,
+            initialX: x,
+            initialY: y
+          };
+          scene.add(line);
+          streamlines.push(line);
+        }
+      }
+
+      function buildExhaustSparks() {
+        const count = 40;
+        const geo = new THREE.BufferGeometry();
+        const positions = new Float32Array(count * 3);
+        for (let i = 0; i < count * 3; i++) {
+          positions[i] = 0;
+        }
+        geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const mat = new THREE.PointsMaterial({
+          color: 0xff3300,
+          size: 0.08,
+          transparent: true,
+          opacity: 0.9,
+          blending: THREE.AdditiveBlending
+        });
+
+        exhaustParticles = new THREE.Points(geo, mat);
+        exhaustParticles.userData = {
+          velocities: Array.from({ length: count }, () => ({
+            vx: (Math.random() - 0.5) * 0.04,
+            vy: (Math.random() - 0.5) * 0.03,
+            vz: -0.15 - Math.random() * 0.25,
+            life: Math.random()
+          }))
+        };
+        scene.add(exhaustParticles);
+      }
+
+      function onWindowResize() {
+        const container = document.getElementById('viewport-container');
+        if (!container || !renderer || !camera) return;
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Smooth damping rotation on mouse drag / idle
+        if (!isDragging) {
+          targetRotationY += 0.003; // Smooth continuous turntable rotation
+        }
+
+        currentRotationY += (targetRotationY - currentRotationY) * 0.08;
+        currentRotationX += (targetRotationX - currentRotationX) * 0.08;
+
+        if (carGroup) {
+          carGroup.rotation.y = currentRotationY;
+          carGroup.rotation.x = currentRotationX;
+        }
+
+        // RPM Dynamics & Telemetry Sync
+        const rpmDamping = isRevving ? 0.2 : 0.08;
+        currentRPM += (targetRPM - currentRPM) * rpmDamping;
+
+        if (isRevving) {
+          // Bouncing rev limiter vibration
+          const flutter = (Math.random() - 0.5) * 350;
+          currentRPM = Math.min(8950, Math.max(8200, currentRPM + flutter));
+          // Camera shudder
+          camera.position.x += (Math.random() - 0.5) * 0.03;
+          camera.position.y += (Math.random() - 0.5) * 0.03;
+        }
+
+        // Engine Thermal Dynamics: As RPM remains high during Rev Engine (or Launch Mode), Engine Temp rises
+        if (isRevving || currentRPM > 4200) {
+          const thermalMultiplier = isRevving ? 0.16 : 0.07;
+          const rpmThermalLoad = Math.max(0.25, (currentRPM - 4000) / 4800);
+          engineTemp = Math.min(MAX_TEMP, engineTemp + thermalMultiplier * rpmThermalLoad);
+        } else {
+          // Radiator & intercooler active cooling when rev is released
+          if (engineTemp > IDLE_TEMP) {
+            engineTemp = Math.max(IDLE_TEMP, engineTemp - 0.045);
+          }
+        }
+
+        updateHUDTelemetry(currentRPM);
+        audioEngine.setRPM(currentRPM);
+
+        // Wheel Rotation
+        const wheelSpeed = (currentRPM / 2000) * 0.15;
+        wheels.forEach(w => {
+          w.rotation.x += wheelSpeed;
+        });
+
+        // Glowing Brake Discs during high rev / launch
+        const heatIntensity = Math.max(0.1, (currentRPM - 3000) / 6000 * 2.8);
+        brakeDiscs.forEach(disc => {
+          disc.material.emissiveIntensity = heatIntensity;
+        });
+
+        // Moving Ground Grid
+        if (groundGrid) {
+          groundGrid.position.z = (groundGrid.position.z + wheelSpeed * 0.4) % 2;
+        }
+
+        // Animate Wind-Tunnel Streamlines
+        const flowMultiplier = isRevving ? 3.5 : 1.0;
+        streamlines.forEach(line => {
+          line.position.z += line.userData.speed * flowMultiplier;
+          if (line.position.z > 8) {
+            line.position.z = -15 - Math.random() * 8;
+          }
+        });
+
+        // Animate Exhaust Particles
+        if (exhaustParticles && (isRevving || isLaunchMode)) {
+          const positions = exhaustParticles.geometry.attributes.position.array;
+          const vels = exhaustParticles.userData.velocities;
+          for (let i = 0; i < vels.length; i++) {
+            const idx = i * 3;
+            vels[i].life -= 0.05;
+            if (vels[i].life <= 0) {
+              // Reset to exhaust tip
+              positions[idx] = (Math.random() > 0.5 ? 0.16 : -0.16) + (Math.random() - 0.5) * 0.05;
+              positions[idx + 1] = 0.28 + (Math.random() - 0.5) * 0.05;
+              positions[idx + 2] = -2.0;
+              vels[i].life = 1.0;
+            } else {
+              positions[idx] += vels[i].vx;
+              positions[idx + 1] += vels[i].vy;
+              positions[idx + 2] += vels[i].vz;
+            }
+          }
+          exhaustParticles.geometry.attributes.position.needsUpdate = true;
+          exhaustParticles.visible = true;
+        } else if (exhaustParticles) {
+          exhaustParticles.visible = false;
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      /* ==========================================================
+         3. HUD TELEMETRY UPDATE ENGINE
+         ========================================================== */
+      function updateHUDTelemetry(rpm) {
+        const rpmDigitsEl = document.getElementById('rpm-digits');
+        const speedDigitsEl = document.getElementById('speed-digits');
+        const tachStrokeEl = document.getElementById('tach-stroke');
+        const gearEl = document.getElementById('gear-indicator');
+        const aeroLabel = document.getElementById('aero-flow-label');
+
+        if (!rpmDigitsEl || !tachStrokeEl) return;
+
+        rpmDigitsEl.textContent = Math.round(rpm);
+
+        // Speed calculation based on RPM and Gear
+        let gearRatio = 0;
+        let gearName = 'N';
+
+        if (rpm > 1200) {
+          if (rpm < 3200) { gearName = '1'; gearRatio = 0.025; }
+          else if (rpm < 4500) { gearName = '2'; gearRatio = 0.038; }
+          else if (rpm < 5800) { gearName = '3'; gearRatio = 0.052; }
+          else if (rpm < 7200) { gearName = '4'; gearRatio = 0.065; }
+          else { gearName = '5'; gearRatio = 0.082; }
+        } else {
+          gearName = 'N';
+          gearRatio = 0;
+        }
+        currentGear = gearName;
+        gearEl.textContent = gearName;
+
+        speedKPH = Math.round(rpm * gearRatio);
+        const boostVal = (0.2 + (rpm / 9000) * 1.9).toFixed(1);
+        speedDigitsEl.textContent = `${speedKPH} KM/H • BOOST: ${boostVal} BAR`;
+
+        if (aeroLabel) {
+          aeroLabel.textContent = `WIND TUNNEL: ${Math.max(120, speedKPH + 160)} KM/H`;
+        }
+
+        // Circular stroke offset calculation (stroke-dasharray: 220)
+        // 0 RPM = 220, 9000 RPM = 25
+        const progress = Math.min(1, Math.max(0, (rpm - 800) / 8200));
+        const offset = 220 - (progress * 195);
+        tachStrokeEl.style.strokeDashoffset = offset;
+
+        // Color shift near redline (8000+ RPM)
+        if (rpm > 7800) {
+          tachStrokeEl.style.stroke = '#ff1e42';
+        } else if (rpm > 5500) {
+          tachStrokeEl.style.stroke = '#ffb703';
+        } else {
+          tachStrokeEl.style.stroke = '#00f0ff';
+        }
+
+        // Shift Light Bar LED activation
+        const leds = [
+          { id: 'led-1', threshold: 2500, type: 'green' },
+          { id: 'led-2', threshold: 3800, type: 'green' },
+          { id: 'led-3', threshold: 5000, type: 'green' },
+          { id: 'led-4', threshold: 6000, type: 'amber' },
+          { id: 'led-5', threshold: 6800, type: 'amber' },
+          { id: 'led-6', threshold: 7400, type: 'amber' },
+          { id: 'led-7', threshold: 8000, type: 'red' },
+          { id: 'led-8', threshold: 8500, type: 'red' },
+        ];
+
+        leds.forEach(led => {
+          const el = document.getElementById(led.id);
+          if (!el) return;
+          if (rpm >= led.threshold) {
+            el.classList.add('lit');
+            if (rpm >= 8300) {
+              el.classList.add('flashing');
+            } else {
+              el.classList.remove('flashing');
+            }
+          } else {
+            el.classList.remove('lit');
+            el.classList.remove('flashing');
+          }
+        });
+
+        // Dynamic Engine Temp SVG Radial Bar Update
+        const tempDigitsEl = document.getElementById('engine-temp-digits');
+        const tempStrokeEl = document.getElementById('temp-stroke');
+        const tempBadgeEl = document.getElementById('temp-status-badge');
+        const tempUnitEl = document.getElementById('engine-temp-unit');
+
+        if (tempDigitsEl && tempStrokeEl) {
+          tempDigitsEl.textContent = Math.round(engineTemp);
+
+          // SVG circle r=32 => circumference = 2 * PI * 32 = 201.06
+          // Range: 70°C (cold min) to 126°C (max overheat limit)
+          const tempFrac = Math.min(1, Math.max(0, (engineTemp - 70) / (MAX_TEMP - 70)));
+          const tempOffset = 201.06 - (tempFrac * 201.06);
+          tempStrokeEl.style.strokeDashoffset = tempOffset;
+
+          // Progressive color filling based on thermal stress
+          if (engineTemp >= 118) {
+            // Overheat State: Flashing Redline with heavy glow
+            tempStrokeEl.style.stroke = '#ff1e42';
+            tempStrokeEl.style.filter = 'drop-shadow(0 0 8px #ff1e42)';
+            if (tempBadgeEl) {
+              tempBadgeEl.textContent = 'OVERHEAT';
+              tempBadgeEl.style.color = '#ff1e42';
+              tempBadgeEl.style.background = 'rgba(255, 30, 66, 0.25)';
+              tempBadgeEl.style.borderColor = '#ff1e42';
+            }
+            if (tempUnitEl) tempUnitEl.style.color = '#ff1e42';
+          } else if (engineTemp >= 107) {
+            // High Thermal Warning (Orange-Red)
+            tempStrokeEl.style.stroke = '#ff4d00';
+            tempStrokeEl.style.filter = 'drop-shadow(0 0 6px rgba(255, 77, 0, 0.6))';
+            if (tempBadgeEl) {
+              tempBadgeEl.textContent = 'HIGH LOAD';
+              tempBadgeEl.style.color = '#ff4d00';
+              tempBadgeEl.style.background = 'rgba(255, 77, 0, 0.15)';
+              tempBadgeEl.style.borderColor = 'rgba(255, 77, 0, 0.4)';
+            }
+            if (tempUnitEl) tempUnitEl.style.color = '#ff4d00';
+          } else if (engineTemp >= 98) {
+            // Elevated Warm (Amber)
+            tempStrokeEl.style.stroke = '#ffb703';
+            tempStrokeEl.style.filter = 'drop-shadow(0 0 5px rgba(255, 183, 3, 0.5))';
+            if (tempBadgeEl) {
+              tempBadgeEl.textContent = 'WARM';
+              tempBadgeEl.style.color = '#ffb703';
+              tempBadgeEl.style.background = 'rgba(255, 183, 3, 0.12)';
+              tempBadgeEl.style.borderColor = 'rgba(255, 183, 3, 0.35)';
+            }
+            if (tempUnitEl) tempUnitEl.style.color = '#ffb703';
+          } else {
+            // Optimal Operating Temp (Cyan / Green)
+            tempStrokeEl.style.stroke = '#00f0ff';
+            tempStrokeEl.style.filter = 'none';
+            if (tempBadgeEl) {
+              tempBadgeEl.textContent = 'NOMINAL';
+              tempBadgeEl.style.color = '#00ff88';
+              tempBadgeEl.style.background = 'rgba(0, 255, 136, 0.1)';
+              tempBadgeEl.style.borderColor = 'rgba(0, 255, 136, 0.25)';
+            }
+            if (tempUnitEl) tempUnitEl.style.color = '#00f0ff';
+          }
+        }
+      }
+
+      /* ==========================================================
+         4. INTERACTIVE 3D CONTROLS (REV, LAUNCH, CAD, COLOR)
+         ========================================================== */
+      function setupInteractiveControls() {
+        const revBtn = document.getElementById('rev-engine-btn');
+        const launchBtn = document.getElementById('launch-mode-btn');
+        const engageLaunchBtn = document.getElementById('engage-launch-btn');
+        const wireframeBtn = document.getElementById('wireframe-btn');
+        const colorBtn = document.getElementById('color-cycle-btn');
+        const audioBtn = document.getElementById('audio-toggle');
+
+        // Rev Engine Event: Press & Hold or Click
+        const startRev = (e) => {
+          if (e) e.preventDefault();
+          isRevving = true;
+          targetRPM = 8750;
+          if (revBtn) revBtn.classList.add('revving');
+          audioEngine.init();
+        };
+
+        const stopRev = () => {
+          if (!isRevving) return;
+          isRevving = false;
+          targetRPM = 950;
+          if (revBtn) revBtn.classList.remove('revving');
+          audioEngine.playBlowOff();
+        };
+
+        if (revBtn) {
+          revBtn.addEventListener('mousedown', startRev);
+          window.addEventListener('mouseup', stopRev);
+          revBtn.addEventListener('touchstart', startRev, { passive: false });
+          window.addEventListener('touchend', stopRev);
+        }
+
+        // Launch Mode Toggle
+        if (launchBtn) {
+          launchBtn.addEventListener('click', () => {
+            isLaunchMode = !isLaunchMode;
+            if (isLaunchMode) {
+              launchBtn.classList.add('active');
+              targetRPM = 5600; // Hold two-step anti lag
+              showToast('LAUNCH CONTROL ENGAGED: HOLDING 5,600 RPM TWO-STEP');
+              audioEngine.init();
+            } else {
+              launchBtn.classList.remove('active');
+              targetRPM = 950;
+              audioEngine.playBlowOff();
+              showToast('LAUNCH CONTROL RELEASED: IDLE RESTORED');
+            }
+          });
+        }
+
+        // Engage Launch Button (Primary CTA)
+        if (engageLaunchBtn) {
+          engageLaunchBtn.addEventListener('click', (e) => {
+            audioEngine.init();
+            isRevving = true;
+            targetRPM = 8800;
+            showToast('ROCKET LAUNCH ENGAGED: TRANSMITTING SPECS');
+            setTimeout(() => {
+              isRevving = false;
+              targetRPM = 950;
+              audioEngine.playBlowOff();
+            }, 1200);
+          });
+        }
+
+        // Wireframe CAD Mode
+        if (wireframeBtn) {
+          wireframeBtn.addEventListener('click', () => {
+            isWireframe = !isWireframe;
+            wireframeBtn.classList.toggle('active', isWireframe);
+            if (carGroup) {
+              carGroup.traverse((child) => {
+                if (child.isMesh && child.material) {
+                  child.material.wireframe = isWireframe;
+                }
+              });
+            }
+            showToast(isWireframe ? 'CAD AERO WIREFRAME: ENABLED' : 'LIVERY SHADER: RESTORED');
+          });
+        }
+
+        // Color Underglow Cycle
+        if (colorBtn) {
+          colorBtn.addEventListener('click', () => {
+            if (currentColorTheme === 'cyan') {
+              currentColorTheme = 'red';
+              if (underglowLight) underglowLight.color.setHex(0xff1e42);
+              showToast('UNDERGLOW TUNING: TACHOMETER REDLINE');
+            } else if (currentColorTheme === 'red') {
+              currentColorTheme = 'amber';
+              if (underglowLight) underglowLight.color.setHex(0xffb703);
+              showToast('UNDERGLOW TUNING: APEX AMBER');
+            } else {
+              currentColorTheme = 'cyan';
+              if (underglowLight) underglowLight.color.setHex(0x00f0ff);
+              showToast('UNDERGLOW TUNING: NITROUS CYAN');
+            }
+          });
+        }
+
+        // Audio Button
+        if (audioBtn) {
+          audioBtn.addEventListener('click', () => {
+            const active = audioEngine.toggle();
+            audioBtn.classList.toggle('active', active);
+            showToast(active ? 'V8 ENGINE AUDIO: SYNTHESIZED ON' : 'V8 ENGINE AUDIO: MUTED');
+          });
+        }
+      }
+
+      /* ==========================================================
+         5. INTERACTIVE DYNO SHEET CANVAS (Horsepower vs Torque)
+         ========================================================== */
+      function initDynoChart() {
+        const canvas = document.getElementById('dyno-chart-canvas');
+        const tooltip = document.getElementById('dyno-tooltip');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+
+        function renderDyno() {
+          const width = canvas.parentElement.clientWidth;
+          const height = canvas.parentElement.clientHeight;
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          ctx.scale(dpr, dpr);
+
+          ctx.clearRect(0, 0, width, height);
+
+          // Grid Lines
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+          ctx.lineWidth = 1;
+          for (let x = 40; x < width; x += 60) {
+            ctx.beginPath();
+            ctx.moveTo(x, 15);
+            ctx.lineTo(x, height - 25);
+            ctx.stroke();
+          }
+          for (let y = 20; y < height - 20; y += 40) {
+            ctx.beginPath();
+            ctx.moveTo(35, y);
+            ctx.lineTo(width - 15, y);
+            ctx.stroke();
+          }
+
+          // X-Axis Labels (RPM)
+          ctx.font = '10px "JetBrains Mono"';
+          ctx.fillStyle = '#5d6778';
+          const rpmPoints = ['1K', '2K', '3K', '4K', '5K', '6K', '7K', '8K', '9K'];
+          rpmPoints.forEach((label, i) => {
+            const x = 50 + (i * (width - 70) / (rpmPoints.length - 1));
+            ctx.fillText(label, x - 8, height - 8);
+          });
+
+          // Curve 1: Power (HP) in Redline
+          ctx.beginPath();
+          ctx.strokeStyle = '#ff1e42';
+          ctx.lineWidth = 3;
+          ctx.shadowColor = 'rgba(255, 30, 66, 0.5)';
+          ctx.shadowBlur = 10;
+
+          const hpPoints = [
+            { x: 50, y: height - 40 },
+            { x: width * 0.2, y: height - 60 },
+            { x: width * 0.4, y: height - 105 },
+            { x: width * 0.65, y: height - 170 },
+            { x: width * 0.85, y: height - 205 }, // Peak Power at 8200 RPM
+            { x: width - 20, y: height - 190 },
+          ];
+
+          ctx.moveTo(hpPoints[0].x, hpPoints[0].y);
+          for (let i = 1; i < hpPoints.length; i++) {
+            const xc = (hpPoints[i].x + hpPoints[i - 1].x) / 2;
+            const yc = (hpPoints[i].y + hpPoints[i - 1].y) / 2;
+            ctx.quadraticCurveTo(hpPoints[i - 1].x, hpPoints[i - 1].y, xc, yc);
+          }
+          ctx.lineTo(hpPoints[hpPoints.length - 1].x, hpPoints[hpPoints.length - 1].y);
+          ctx.stroke();
+
+          // Curve 2: Torque (Nm) in Nitrous Cyan
+          ctx.beginPath();
+          ctx.strokeStyle = '#00f0ff';
+          ctx.lineWidth = 3;
+          ctx.shadowColor = 'rgba(0, 240, 255, 0.5)';
+          ctx.shadowBlur = 10;
+
+          const tqPoints = [
+            { x: 50, y: height - 55 },
+            { x: width * 0.25, y: height - 130 },
+            { x: width * 0.5, y: height - 180 }, // Flat torque peak 4.5K - 6.5K
+            { x: width * 0.72, y: height - 175 },
+            { x: width * 0.88, y: height - 145 },
+            { x: width - 20, y: height - 120 },
+          ];
+
+          ctx.moveTo(tqPoints[0].x, tqPoints[0].y);
+          for (let i = 1; i < tqPoints.length; i++) {
+            const xc = (tqPoints[i].x + tqPoints[i - 1].x) / 2;
+            const yc = (tqPoints[i].y + tqPoints[i - 1].y) / 2;
+            ctx.quadraticCurveTo(tqPoints[i - 1].x, tqPoints[i - 1].y, xc, yc);
+          }
+          ctx.lineTo(tqPoints[tqPoints.length - 1].x, tqPoints[tqPoints.length - 1].y);
+          ctx.stroke();
+
+          ctx.shadowBlur = 0; // Reset shadow
+
+          // Plotted Tech Stack Nodes
+          const techNodes = [
+            { x: width * 0.85, y: height - 205, label: 'Java Core (99.4 HP)', color: '#ff1e42' },
+            { x: width * 0.65, y: height - 170, label: 'Hibernate & JDBC', color: '#ff1e42' },
+            { x: width * 0.5, y: height - 180, label: 'MySQL Indexing (680 Nm)', color: '#00f0ff' },
+            { x: width * 0.35, y: height - 110, label: 'React.js Telemetry', color: '#00ff88' },
+          ];
+
+          techNodes.forEach(node => {
+            ctx.fillStyle = node.color;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.font = '11px "Chakra Petch"';
+            ctx.fillStyle = '#fff';
+            ctx.fillText(node.label, node.x - 45, node.y - 12);
+          });
+        }
+
+        renderDyno();
+        window.addEventListener('resize', renderDyno);
+      }
+
+      /* ==========================================================
+         6. POWERTRAIN FILTERING
+         ========================================================== */
+      function setupPowertrainTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const cards = document.querySelectorAll('.engine-spec-card');
+
+        tabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            const filter = tab.getAttribute('data-filter');
+
+            cards.forEach(card => {
+              const category = card.getAttribute('data-category');
+              if (filter === 'all' || category === filter) {
+                card.style.display = 'block';
+              } else {
+                card.style.display = 'none';
+              }
+            });
+          });
+        });
+      }
+
+      /* ==========================================================
+         7. PROJECT SIMULATION RUNS (Finance Tracker & AI Inspector)
+         ========================================================== */
+      function simulateFinanceData() {
+        const chartBars = document.querySelectorAll('#finance-chart-bars .chart-col');
+        chartBars.forEach(col => {
+          const incomeBar = col.querySelector('.chart-bar-income');
+          const expenseBar = col.querySelector('.chart-bar-expense');
+          const newIncome = Math.floor(Math.random() * 55 + 40);
+          const newExpense = Math.floor(Math.random() * 45 + 15);
+          if (incomeBar) incomeBar.style.height = `${newIncome}%`;
+          if (expenseBar) expenseBar.style.height = `${newExpense}%`;
+        });
+        showToast('FINANCE TRACKER: RECHARTS TELEMETRY RE-SIMULATED');
+      }
+
+      function runSimulatedCodeAudit() {
+        const auditTag = document.getElementById('audit-status-tag');
+        const stream = document.getElementById('audit-results-stream');
+        if (!auditTag || !stream) return;
+
+        auditTag.textContent = 'GEMINI SCANNING...';
+        auditTag.style.color = '#00f0ff';
+        stream.style.display = 'none';
+
+        setTimeout(() => {
+          auditTag.textContent = 'AUDIT COMPLETE: 0 CRITICAL';
+          auditTag.style.color = '#00ff88';
+          stream.style.display = 'block';
+          showToast('GEMINI AI CODE AUDIT: INSPECTION COMPLETE');
+        }, 800);
+      }
+
+      /* ==========================================================
+         8. PIT STOP COMMS TRANSMISSION FORM
+         ========================================================== */
+      function handleCommsSubmit(e) {
+        e.preventDefault();
+        const driverName = document.getElementById('driver-name').value;
+        const driverEmail = document.getElementById('driver-email').value;
+        const driverMsg = document.getElementById('driver-msg').value;
+        const logBox = document.getElementById('comms-terminal-log');
+        const btn = document.getElementById('send-comms-btn');
+
+        if (!driverName || !driverEmail) return;
+
+        btn.disabled = true;
+        btn.textContent = 'TRANSMITTING TELEMETRY...';
+        logBox.innerHTML = `&gt; ENCRYPTING PACKET FOR PILOT [${driverName.toUpperCase()}]...<br>&gt; ROUTING FREQUENCY: ${driverEmail}...`;
+
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = 'TRANSMIT SECURE TELEMETRY PAYLOAD';
+          logBox.innerHTML = `&gt; [200 OK]: TRANSMISSION ACKNOWLEDGED BY NIKHIL CHOURASIYA.<br>&gt; COMM LOGGED AT PADDOCK BENGALURU. STAND BY FOR RETURN PING!`;
+          showToast('TRANSMISSION SENT: NIKHIL HAS RECEIVED YOUR PAYLOAD!');
+          document.getElementById('paddock-comms-form').reset();
+        }, 900);
+      }
+
+      /* ==========================================================
+         9. UTILITIES: TOAST & CLIPBOARD & PADDOCK CLOCK
+         ========================================================== */
+      let toastTimeout;
+      function showToast(message) {
+        const toast = document.getElementById('telemetry-toast');
+        const msgEl = document.getElementById('toast-message');
+        if (!toast || !msgEl) return;
+
+        msgEl.textContent = message;
+        toast.classList.add('visible');
+
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove('visible');
+        }, 3200);
+      }
+
+      function copyToClipboard(text, successMsg) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(successMsg || 'Copied to paddock clipboard!');
+        }).catch(() => {
+          showToast('Copied: ' + text);
+        });
+      }
+
+      function updatePaddockClock() {
+        const clockEl = document.getElementById('paddock-time');
+        if (!clockEl) return;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata', hour12: false });
+        clockEl.textContent = `IST ${timeStr} • BENGALURU PADDOCK`;
+      }
+
+      // Mobile Menu Toggle
+      const mobileToggle = document.getElementById('mobile-toggle');
+      const mobileDrawer = document.getElementById('mobile-drawer');
+
+      if (mobileToggle && mobileDrawer) {
+        mobileToggle.addEventListener('click', () => {
+          mobileDrawer.classList.toggle('open');
+        });
+      }
+
+      function closeMobileMenu() {
+        if (mobileDrawer) {
+          mobileDrawer.classList.remove('open');
+        }
+      }
+
+      // Smooth section highlighting in Navbar
+      window.addEventListener('scroll', () => {
+        const sections = ['hero', 'powertrain', 'dyno-runs', 'track-log', 'pit-stop'];
+        const scrollPos = window.scrollY + 200;
+
+        sections.forEach(id => {
+          const el = document.getElementById(id);
+          const link = document.querySelector(`.nav-links a[href="#${id}"]`);
+          if (el && link) {
+            const top = el.offsetTop;
+            const height = el.offsetHeight;
+            if (scrollPos >= top && scrollPos < top + height) {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
+            }
+          }
+        });
+      });
+
+      // Initialization on Load
+      window.addEventListener('DOMContentLoaded', () => {
+        initThreeScene();
+        setupInteractiveControls();
+        initDynoChart();
+        setupPowertrainTabs();
+        updatePaddockClock();
+        setInterval(updatePaddockClock, 1000);
+      });
+    </script>
+  </body>
+</html>
